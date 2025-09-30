@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is machine learning?",
+    "answer": "Machine learning is a subset of AI that enables computers to learn from data"
+  },
+  {
+    "question": "How does AI work?",
+    "answer": "AI works by processing data and making decisions based on patterns it learns"
+  },
+  {
+    "question": "Hello",
+    "answer": "Hello! How can I help you today?"
+  },
+  {
+    "question": "Hi",
+    "answer": "Hi there! What would you like to know?"
+  },
+  {
+    "question": "What can you do?",
+    "answer": "I can answer questions based on my training data. Feel free to ask me anything!"
+  },
+  {
+    "question": "Help",
+    "answer": "I'm here to help! You can ask me questions and I'll do my best to answer them."
+  },
+  {
+    "question": "Thank you",
+    "answer": "You're welcome! Is there anything else I can help you with?"
+  },
+  {
+    "question": "Goodbye",
+    "answer": "Goodbye! Have a great day!"
+  },
+  {
+    "question": "Thanks",
+    "answer": "You're welcome! Is there anything else I can help you with?"
+  },
+  {
+    "question": "Thank you",
+    "answer": "You're welcome! Is there anything else I can help you with?"
+  },
+  {
+    "question": "Bye",
+    "answer": "Goodbye! Have a great day!"
+  },
+  {
+    "question": "See you later",
+    "answer": "See you later! Take care!"
+  },
+  {
+    "question": "What is HTML?",
+    "answer": "HTML is a markup language used to create web pages."
+  }
+]
