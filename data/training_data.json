@@ -50,5 +50,61 @@
   {
     "question": "What is HTML?",
     "answer": "HTML is a markup language used to create web pages."
+  },
+  {
+    "question": "What is CSS?",
+    "answer": "CSS is a style sheet language used to describe the presentation of a document written in HTML."
+  },
+  {
+    "question": "What is JavaScript?",
+    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages."
+  },
+  {
+    "question": "What is Python?",
+    "answer": "Python is a programming language that allows you to implement complex features on web pages."
+  },
+  {
+    "question": "What is React?",
+    "answer": "React is a library for building user interfaces."
+  },
+  {
+    "question": "What is Node.js?",
+    "answer": "Node.js is a runtime environment for executing JavaScript code outside of a browser."
+  },
+  {
+    "question": "What is SQL?",
+    "answer": "SQL is a standard language for managing relational databases."
+  },
+  {
+    "question": "What is MongoDB?",
+    "answer": "MongoDB is a NoSQL database that uses JSON-like documents with optional schemas."
+  },
+  {
+    "question": "What is Docker?",
+    "answer": "Docker is a platform for containerizing applications."
+  },
+  {
+    "question": "What is Kubernetes?",
+    "answer": "Kubernetes is a platform for managing containerized applications."
+  },
+  {
+    "question": "What is Terraform?",
+    "answer": "Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently."
+  },
+  {
+    "question": "What is Ansible?",
+    "answer": "Ansible is a platform for managing infrastructure as code."
+  },
+  {
+    "question": "What is Prometheus?",
+    "answer": "Prometheus is a monitoring system for time series data."
+  },
+  {
+    "question": "What is Grafana?",
+    "answer": "Grafana is a tool for visualizing time series data."
+  },
+  {
+    "question": "What is ELK Stack?",
+    "answer": "ELK Stack is a tool for logging and monitoring."
   }
 ]
