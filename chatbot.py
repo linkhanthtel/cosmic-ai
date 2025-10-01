@@ -22,6 +22,12 @@ class ChatBot:
         self.model = None
         self.training_data = []
         
+        # Conversation memory and context
+        self.conversation_history = []
+        self.user_context = {}
+        self.conversation_topics = []
+        self.follow_up_questions = []
+        
         # Load existing data and model
         self.load_training_data()
         self.load_model()
@@ -140,11 +146,41 @@ class ChatBot:
         return self.train_model()
     
     def get_response(self, user_input):
-        """Get response from the chatbot"""
+        """Get response from the chatbot with conversation context"""
         try:
             if self.model is None or not self.training_data:
                 return "I haven't been trained yet. Please add some training data and train me first!"
             
+            # Add to conversation history
+            self.conversation_history.append({
+                'user': user_input,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+            # Update conversation context
+            self._update_conversation_context(user_input)
+            
+            # Get base response
+            base_response = self._get_base_response(user_input)
+            
+            # Enhance response with context and follow-ups
+            enhanced_response = self._enhance_response(base_response, user_input)
+            
+            # Add bot response to history
+            self.conversation_history.append({
+                'bot': enhanced_response,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+            return enhanced_response
+        
+        except Exception as e:
+            print(f"Error getting response: {e}")
+            return "I'm sorry, I encountered an error processing your message. Please try again."
+    
+    def _get_base_response(self, user_input):
+        """Get the base response from the model"""
+        try:
             # Transform user input
             user_vector = self.vectorizer.transform([user_input])
             
@@ -165,8 +201,137 @@ class ChatBot:
             return predicted_answer
         
         except Exception as e:
-            print(f"Error getting response: {e}")
-            return "I'm sorry, I encountered an error processing your message. Please try again."
+            print(f"Error getting base response: {e}")
+            return "I'm not sure how to respond to that. Could you please rephrase your question?"
+    
+    def _update_conversation_context(self, user_input):
+        """Update conversation context and topics"""
+        # Extract topics from user input
+        words = user_input.lower().split()
+        topic_keywords = {
+            'programming': ['code', 'programming', 'python', 'javascript', 'java', 'html', 'css', 'react', 'node'],
+            'ai': ['ai', 'artificial', 'intelligence', 'machine', 'learning', 'neural', 'deep'],
+            'technology': ['tech', 'technology', 'computer', 'software', 'hardware', 'database'],
+            'web': ['web', 'website', 'internet', 'browser', 'frontend', 'backend'],
+            'data': ['data', 'database', 'sql', 'analytics', 'science']
+        }
+        
+        for topic, keywords in topic_keywords.items():
+            if any(keyword in words for keyword in keywords):
+                if topic not in self.conversation_topics:
+                    self.conversation_topics.append(topic)
+        
+        # Keep only last 5 topics
+        self.conversation_topics = self.conversation_topics[-5:]
+    
+    def _enhance_response(self, base_response, user_input):
+        """Enhance response with context, follow-ups, and personality"""
+        enhanced = base_response
+        
+        # Add contextual references
+        if self.conversation_topics:
+            topic_context = self._get_topic_context()
+            if topic_context:
+                enhanced += f"\n\n{topic_context}"
+        
+        # Add follow-up questions
+        follow_ups = self._generate_follow_up_questions(user_input, base_response)
+        if follow_ups:
+            enhanced += f"\n\n💡 **Follow-up questions:**\n"
+            for i, question in enumerate(follow_ups[:3], 1):
+                enhanced += f"{i}. {question}\n"
+        
+        # Add conversation continuity
+        if len(self.conversation_history) > 2:
+            continuity = self._add_conversation_continuity()
+            if continuity:
+                enhanced += f"\n\n{continuity}"
+        
+        return enhanced
+    
+    def _get_topic_context(self):
+        """Get context based on conversation topics"""
+        if not self.conversation_topics:
+            return ""
+        
+        recent_topics = self.conversation_topics[-2:]  # Last 2 topics
+        
+        context_responses = {
+            'programming': "I notice you're interested in programming! I can help with various programming languages and concepts.",
+            'ai': "AI and machine learning are fascinating topics! I'd be happy to discuss these further.",
+            'technology': "Technology is a broad and exciting field! What specific aspect interests you most?",
+            'web': "Web development is a great skill to have! I can help with both frontend and backend concepts.",
+            'data': "Data science and analytics are crucial in today's world! I can help explain various data concepts."
+        }
+        
+        return context_responses.get(recent_topics[-1], "")
+    
+    def _generate_follow_up_questions(self, user_input, response):
+        """Generate relevant follow-up questions"""
+        follow_ups = []
+        
+        # Programming-related follow-ups
+        if any(word in user_input.lower() for word in ['python', 'programming', 'code', 'language']):
+            follow_ups.extend([
+                "Would you like to learn about Python libraries like pandas or numpy?",
+                "Are you interested in web development with Python frameworks?",
+                "Do you want to know about Python best practices?"
+            ])
+        
+        # AI-related follow-ups
+        elif any(word in user_input.lower() for word in ['ai', 'machine learning', 'artificial intelligence']):
+            follow_ups.extend([
+                "Would you like to know about different types of machine learning?",
+                "Are you interested in neural networks and deep learning?",
+                "Do you want to learn about AI applications in real-world scenarios?"
+            ])
+        
+        # General follow-ups
+        else:
+            follow_ups.extend([
+                "Is there anything specific you'd like to know more about?",
+                "Would you like me to explain this in more detail?",
+                "Do you have any related questions?"
+            ])
+        
+        return follow_ups
+    
+    def _add_conversation_continuity(self):
+        """Add conversation continuity based on history"""
+        if len(self.conversation_history) < 4:
+            return ""
+        
+        # Check if user is asking similar questions
+        recent_questions = [entry['user'] for entry in self.conversation_history[-4:] if 'user' in entry]
+        
+        if len(recent_questions) >= 2:
+            # Simple similarity check
+            last_question = recent_questions[-1].lower()
+            second_last_question = recent_questions[-2].lower()
+            
+            common_words = set(last_question.split()) & set(second_last_question.split())
+            if len(common_words) >= 2:
+                return "I see you're exploring this topic further! Feel free to ask any related questions."
+        
+        return ""
+    
+    def get_conversation_summary(self):
+        """Get a summary of the current conversation"""
+        if not self.conversation_history:
+            return "No conversation yet."
+        
+        topics = ", ".join(self.conversation_topics) if self.conversation_topics else "General discussion"
+        message_count = len([entry for entry in self.conversation_history if 'user' in entry])
+        
+        return f"Conversation topics: {topics} | Messages exchanged: {message_count}"
+    
+    def clear_conversation(self):
+        """Clear conversation history"""
+        self.conversation_history = []
+        self.user_context = {}
+        self.conversation_topics = []
+        self.follow_up_questions = []
+        return "Conversation cleared! Starting fresh."
     
     def _similarity_based_response(self, user_input):
         """Fallback response using similarity matching"""
