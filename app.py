@@ -128,6 +128,42 @@ def retrain():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/conversation/summary', methods=['GET'])
+def get_conversation_summary():
+    try:
+        summary = chatbot.get_conversation_summary()
+        return jsonify({
+            'summary': summary,
+            'topics': chatbot.conversation_topics,
+            'message_count': len([entry for entry in chatbot.conversation_history if 'user' in entry])
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/conversation/clear', methods=['POST'])
+def clear_conversation():
+    try:
+        message = chatbot.clear_conversation()
+        return jsonify({
+            'message': message,
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/conversation/history', methods=['GET'])
+def get_conversation_history():
+    try:
+        return jsonify({
+            'history': chatbot.conversation_history[-10:],  # Last 10 messages
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Create necessary directories
     os.makedirs('templates', exist_ok=True)
