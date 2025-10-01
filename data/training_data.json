@@ -52,6 +52,42 @@
     "answer": "HTML is a markup language used to create web pages."
   },
   {
+    "question": "I want to learn Python programming",
+    "answer": "Great choice! Python is an excellent programming language for beginners. It's known for its simple syntax and readability. You can start with basic concepts like variables, loops, and functions."
+  },
+  {
+    "question": "What Python libraries should I start with?",
+    "answer": "For beginners, I recommend starting with these essential Python libraries: 1) NumPy for numerical computing, 2) Pandas for data manipulation, 3) Matplotlib for data visualization, and 4) Requests for web requests."
+  },
+  {
+    "question": "Tell me about machine learning",
+    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
+  },
+  {
+    "question": "What are the types of machine learning?",
+    "answer": "There are three main types of machine learning: 1) Supervised Learning (learning with labeled data), 2) Unsupervised Learning (finding patterns in unlabeled data), and 3) Reinforcement Learning (learning through trial and error)."
+  },
+  {
+    "question": "How do I start with data science?",
+    "answer": "To start with data science, learn Python or R, understand statistics and mathematics, practice with real datasets, learn data visualization tools, and work on projects. Start with basic data analysis and gradually move to machine learning."
+  },
+  {
+    "question": "What is web development?",
+    "answer": "Web development involves creating websites and web applications. It includes frontend development (what users see) using HTML, CSS, and JavaScript, and backend development (server-side logic) using languages like Python, Node.js, or PHP."
+  },
+  {
+    "question": "What should I learn for frontend development?",
+    "answer": "For frontend development, start with HTML for structure, CSS for styling, and JavaScript for interactivity. Then learn popular frameworks like React, Vue.js, or Angular. Also learn responsive design and web accessibility."
+  },
+  {
+    "question": "What is a database?",
+    "answer": "A database is an organized collection of data stored and accessed electronically. Common types include relational databases (MySQL, PostgreSQL) and NoSQL databases (MongoDB, Redis). They're essential for storing and managing application data."
+  },
+  {
+    "question": "How do I become a better programmer?",
+    "answer": "To become a better programmer: 1) Practice coding regularly, 2) Read other people's code, 3) Work on projects, 4) Learn new technologies, 5) Write clean, readable code, 6) Use version control (Git), and 7) Collaborate with other developers."
+  },
+  {
     "question": "What is CSS?",
     "answer": "CSS is a style sheet language used to describe the presentation of a document written in HTML."
   },
