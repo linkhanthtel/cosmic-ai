@@ -60,6 +60,46 @@
             font-weight: 600;
             color: var(--text-primary);
             text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .conversation-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .topic-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .topic-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .clear-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
         }
 
         .chat-container {
@@ -331,8 +371,31 @@
 
         .welcome-message p {
             font-size: 18px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             color: var(--text-secondary);
+        }
+
+        .welcome-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .feature span {
+            font-weight: 500;
         }
 
 
@@ -446,12 +509,21 @@
     <div class="app">
         <div class="header">
             <h1>Cosmic AI</h1>
+            <div class="conversation-info" id="conversationInfo">
+                <span class="topic-tags" id="topicTags"></span>
+                <button class="clear-btn" onclick="clearConversation()" title="Clear conversation">🗑️</button>
+            </div>
         </div>
 
         <div class="chat-container" id="chatContainer">
         <div class="welcome-message">
             <h2>Hello! I'm Cosmic AI.</h2>
-            <p>How can I help you today?</p>
+            <p>I'm your intelligent assistant with conversation memory and context awareness. How can I help you today?</p>
+            <div class="welcome-features">
+                <div class="feature">🧠 <span>Remembers our conversation</span></div>
+                <div class="feature">💡 <span>Suggests follow-up questions</span></div>
+                <div class="feature">🎯 <span>Adapts to your interests</span></div>
+            </div>
         </div>
         </div>
 
@@ -546,26 +618,6 @@
             });
         }
 
-        function addMessageToChat(message, sender) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = `avatar ${sender}`;
-            avatar.textContent = sender === 'user' ? 'You' : 'AI';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            content.textContent = message;
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            chatContainer.appendChild(messageDiv);
-            
-            // Scroll to bottom
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
 
         function showTypingIndicator() {
             isTyping = true;
@@ -595,9 +647,99 @@
             }, 4000);
         }
 
+        // Conversation management
+        function updateConversationInfo() {
+            fetch('/conversation/summary')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.topics && data.topics.length > 0) {
+                        const topicTags = document.getElementById('topicTags');
+                        topicTags.innerHTML = data.topics.map(topic => 
+                            `<span class="topic-tag">${topic}</span>`
+                        ).join('');
+                    }
+                })
+                .catch(error => console.log('Error updating conversation info:', error));
+        }
+
+        function clearConversation() {
+            if (confirm('Are you sure you want to clear the conversation?')) {
+                fetch('/conversation/clear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Clear the chat container
+                    const chatContainer = document.getElementById('chatContainer');
+                    chatContainer.innerHTML = `
+                        <div class="welcome-message">
+                            <h2>Hello! I'm Cosmic AI.</h2>
+                            <p>I'm your intelligent assistant with conversation memory and context awareness. How can I help you today?</p>
+                            <div class="welcome-features">
+                                <div class="feature">🧠 <span>Remembers our conversation</span></div>
+                                <div class="feature">💡 <span>Suggests follow-up questions</span></div>
+                                <div class="feature">🎯 <span>Adapts to your interests</span></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Clear topic tags
+                    document.getElementById('topicTags').innerHTML = '';
+                    
+                    showStatus('Conversation cleared!', 'success');
+                })
+                .catch(error => {
+                    showStatus('Error clearing conversation: ' + error.message, 'error');
+                });
+            }
+        }
+
+        function addMessageToChat(message, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Remove welcome message if it exists
+            const welcomeMessage = document.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${sender}`;
+            avatar.textContent = sender === 'user' ? 'You' : 'AI';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            // Parse markdown-like formatting
+            let formattedMessage = message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+            
+            content.innerHTML = formattedMessage;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Update conversation info after bot response
+            if (sender === 'bot') {
+                updateConversationInfo();
+            }
+        }
+
         // Focus on input when page loads
         window.onload = function() {
             document.getElementById('messageInput').focus();
+            updateConversationInfo();
         };
     </script>
 </body>
