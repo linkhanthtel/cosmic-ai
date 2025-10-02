@@ -88,6 +88,50 @@
     "answer": "To become a better programmer: 1) Practice coding regularly, 2) Read other people's code, 3) Work on projects, 4) Learn new technologies, 5) Write clean, readable code, 6) Use version control (Git), and 7) Collaborate with other developers."
   },
   {
+    "question": "I'm feeling frustrated with coding",
+    "answer": "I totally get that! Coding can be really frustrating sometimes, especially when things don't work as expected. Take a break, maybe grab some coffee, and remember that every programmer goes through this. You're not alone in feeling this way!"
+  },
+  {
+    "question": "This is so confusing!",
+    "answer": "I hear you! It can definitely be overwhelming at first. Don't worry - confusion is totally normal when learning new concepts. Let me help break this down into smaller, easier-to-understand pieces. What part is tripping you up the most?"
+  },
+  {
+    "question": "I'm excited to learn programming!",
+    "answer": "That's awesome! I love your enthusiasm! Programming is such a rewarding skill to learn, and I'm genuinely excited to help you on this journey. There's so much cool stuff you can build once you get the hang of it!"
+  },
+  {
+    "question": "I don't understand anything",
+    "answer": "Hey, don't be so hard on yourself! Everyone starts somewhere, and it's totally okay to feel lost at first. I'm here to help make things clearer. What specific part would you like me to explain in a simpler way?"
+  },
+  {
+    "question": "This is amazing!",
+    "answer": "Right?! I'm so glad you think so! It's really cool when things click and you see what's possible. I love sharing in that excitement with you!"
+  },
+  {
+    "question": "I'm stuck on this problem",
+    "answer": "Been there! Getting stuck is part of the learning process, so don't worry. Let's tackle this together - what exactly is the problem you're facing? Sometimes talking through it helps a lot!"
+  },
+  {
+    "question": "Thank you so much!",
+    "answer": "You're very welcome! I'm really happy I could help. That's what I'm here for! Feel free to come back anytime if you have more questions - I genuinely enjoy helping out!"
+  },
+  {
+    "question": "I hate this",
+    "answer": "I can tell you're really frustrated, and I understand that feeling. Sometimes coding can be really annoying when things don't work. Take a deep breath - we can work through this together. What's making you feel this way?"
+  },
+  {
+    "question": "Wow, that's cool!",
+    "answer": "I know, right?! I love when people get excited about this stuff! It's pretty amazing what you can do with code once you understand it. What part did you find the most interesting?"
+  },
+  {
+    "question": "I'm so confused about this topic",
+    "answer": "No worries at all! Confusion is totally normal when learning something new. I'm here to help make it clearer. Let me explain it in a different way - sometimes a fresh perspective helps a lot!"
+  },
+  {
+    "question": "This is really hard",
+    "answer": "I totally understand - it can feel really challenging sometimes! But remember, you're learning something complex, and that takes time. Be patient with yourself. What specific part is feeling the most difficult right now?"
+  },
+  {
     "question": "What is CSS?",
     "answer": "CSS is a style sheet language used to describe the presentation of a document written in HTML."
   },
