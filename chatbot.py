@@ -228,21 +228,23 @@ class ChatBot:
         """Enhance response with context, follow-ups, and personality"""
         enhanced = base_response
         
-        # Add contextual references
-        if self.conversation_topics:
+        # Add contextual references (only occasionally)
+        if self.conversation_topics and len(self.conversation_history) % 3 == 0:
             topic_context = self._get_topic_context()
             if topic_context:
                 enhanced += f"\n\n{topic_context}"
         
-        # Add follow-up questions
-        follow_ups = self._generate_follow_up_questions(user_input, base_response)
-        if follow_ups:
-            enhanced += f"\n\n💡 **Follow-up questions:**\n"
-            for i, question in enumerate(follow_ups[:3], 1):
-                enhanced += f"{i}. {question}\n"
+        # Add follow-up questions only in specific cases (much less frequent)
+        should_add_followups = self._should_add_followup_questions(user_input, base_response)
+        if should_add_followups:
+            follow_ups = self._generate_follow_up_questions(user_input, base_response)
+            if follow_ups:
+                enhanced += f"\n\n💡 **Follow-up questions:**\n"
+                for i, question in enumerate(follow_ups[:2], 1):  # Reduced to 2 questions
+                    enhanced += f"{i}. {question}\n"
         
-        # Add conversation continuity
-        if len(self.conversation_history) > 2:
+        # Add conversation continuity (less frequent)
+        if len(self.conversation_history) > 4 and len(self.conversation_history) % 4 == 0:
             continuity = self._add_conversation_continuity()
             if continuity:
                 enhanced += f"\n\n{continuity}"
@@ -266,6 +268,26 @@ class ChatBot:
         
         return context_responses.get(recent_topics[-1], "")
     
+    def _should_add_followup_questions(self, user_input, response):
+        """Determine if follow-up questions should be added"""
+        # Don't add follow-ups for simple greetings or short responses
+        if any(word in user_input.lower() for word in ['hello', 'hi', 'hey', 'thanks', 'thank you', 'bye', 'goodbye', 'ok', 'okay', 'yes', 'no']):
+            return False
+        
+        # Don't add follow-ups if the response indicates uncertainty
+        if any(phrase in response.lower() for phrase in ["i'm not sure", "i don't know", "could you please rephrase"]):
+            return False
+        
+        # Only add follow-ups for very specific learning questions (much less frequent)
+        learning_keywords = ['learn', 'teach', 'explain', 'how to', 'what is', 'tell me about', 'show me']
+        has_learning_keywords = any(keyword in user_input.lower() for keyword in learning_keywords)
+        
+        # Only add follow-ups for learning questions AND only every 5th message
+        if has_learning_keywords and len(self.conversation_history) % 5 == 0:
+            return True
+        
+        return False
+    
     def _generate_follow_up_questions(self, user_input, response):
         """Generate relevant follow-up questions"""
         follow_ups = []
@@ -274,24 +296,35 @@ class ChatBot:
         if any(word in user_input.lower() for word in ['python', 'programming', 'code', 'language']):
             follow_ups.extend([
                 "Would you like to learn about Python libraries like pandas or numpy?",
-                "Are you interested in web development with Python frameworks?",
-                "Do you want to know about Python best practices?"
+                "Are you interested in web development with Python frameworks?"
             ])
         
         # AI-related follow-ups
         elif any(word in user_input.lower() for word in ['ai', 'machine learning', 'artificial intelligence']):
             follow_ups.extend([
                 "Would you like to know about different types of machine learning?",
-                "Are you interested in neural networks and deep learning?",
-                "Do you want to learn about AI applications in real-world scenarios?"
+                "Are you interested in neural networks and deep learning?"
             ])
         
-        # General follow-ups
+        # Web development follow-ups
+        elif any(word in user_input.lower() for word in ['web', 'frontend', 'backend', 'html', 'css', 'javascript']):
+            follow_ups.extend([
+                "Would you like to learn about specific web frameworks?",
+                "Are you interested in responsive design or web accessibility?"
+            ])
+        
+        # Data science follow-ups
+        elif any(word in user_input.lower() for word in ['data', 'database', 'analytics', 'science']):
+            follow_ups.extend([
+                "Would you like to learn about data visualization tools?",
+                "Are you interested in specific database technologies?"
+            ])
+        
+        # General follow-ups (only for learning questions)
         else:
             follow_ups.extend([
                 "Is there anything specific you'd like to know more about?",
-                "Would you like me to explain this in more detail?",
-                "Do you have any related questions?"
+                "Would you like me to explain this in more detail?"
             ])
         
         return follow_ups
