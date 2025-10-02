@@ -28,6 +28,18 @@ class ChatBot:
         self.conversation_topics = []
         self.follow_up_questions = []
         
+        # Personality and human-like traits
+        self.personality_traits = {
+            'enthusiasm': 0.8,  # How excited/enthusiastic the bot is
+            'empathy': 0.9,     # How empathetic and understanding
+            'humor': 0.6,       # How often to use humor
+            'formality': 0.3,   # 0 = very casual, 1 = very formal
+            'curiosity': 0.7    # How curious and asking questions
+        }
+        self.conversation_mood = 'neutral'  # neutral, excited, concerned, playful
+        self.user_name = None
+        self.conversation_start_time = None
+        
         # Load existing data and model
         self.load_training_data()
         self.load_model()
@@ -226,7 +238,11 @@ class ChatBot:
     
     def _enhance_response(self, base_response, user_input):
         """Enhance response with context, follow-ups, and personality"""
-        enhanced = base_response
+        # Start with human-like base response
+        enhanced = self._make_response_human_like(base_response, user_input)
+        
+        # Add personality touches
+        enhanced = self._add_personality_touches(enhanced, user_input)
         
         # Add contextual references (only occasionally)
         if self.conversation_topics and len(self.conversation_history) % 3 == 0:
@@ -358,12 +374,174 @@ class ChatBot:
         
         return f"Conversation topics: {topics} | Messages exchanged: {message_count}"
     
+    def _make_response_human_like(self, base_response, user_input):
+        """Make the response more human-like and natural"""
+        import random
+        
+        # Detect user's emotional state and adjust response accordingly
+        user_emotion = self._detect_user_emotion(user_input)
+        self._update_conversation_mood(user_emotion)
+        
+        # Add natural conversation starters
+        if len(self.conversation_history) <= 2:
+            greetings = [
+                "Hey there! ",
+                "Hi! ",
+                "Hello! ",
+                "Great to meet you! ",
+                "Nice to chat with you! "
+            ]
+            if random.random() < 0.3:
+                base_response = random.choice(greetings) + base_response
+        
+        # Add emotional responses
+        if user_emotion == 'excited':
+            excitement_phrases = ["That's awesome! ", "I love your enthusiasm! ", "That's fantastic! "]
+            if random.random() < 0.4:
+                base_response = random.choice(excitement_phrases) + base_response
+        
+        elif user_emotion == 'frustrated':
+            empathy_phrases = ["I understand that can be frustrating. ", "I hear you. ", "That sounds challenging. "]
+            if random.random() < 0.5:
+                base_response = random.choice(empathy_phrases) + base_response
+        
+        elif user_emotion == 'confused':
+            helpful_phrases = ["No worries, let me help clarify that. ", "I can see why that might be confusing. ", "Let me break that down for you. "]
+            if random.random() < 0.4:
+                base_response = random.choice(helpful_phrases) + base_response
+        
+        return base_response
+    
+    def _add_personality_touches(self, response, user_input):
+        """Add personality touches to make responses more human"""
+        import random
+        
+        # Add casual language based on formality level
+        if self.personality_traits['formality'] < 0.5:
+            # Make it more casual
+            response = response.replace("I recommend", "I'd suggest")
+            response = response.replace("It is important", "It's important")
+            response = response.replace("You should", "You might want to")
+        
+        # Add enthusiasm based on personality
+        if self.personality_traits['enthusiasm'] > 0.7:
+            enthusiastic_phrases = [
+                "That's really cool!",
+                "I'm excited to help!",
+                "This is fascinating!",
+                "I love talking about this!"
+            ]
+            if random.random() < 0.2:
+                response += f" {random.choice(enthusiastic_phrases)}"
+        
+        # Add humor occasionally
+        if self.personality_traits['humor'] > 0.5 and random.random() < 0.15:
+            humor_phrases = [
+                " (I promise I'm not making this up! 😄)",
+                " (Trust me, I've been around the block with this stuff! 😊)",
+                " (I know, I know, I sound like a broken record sometimes! 😅)"
+            ]
+            response += random.choice(humor_phrases)
+        
+        # Add personal touches
+        if random.random() < 0.1:
+            personal_touches = [
+                " I hope that helps!",
+                " Let me know if you need more details!",
+                " Feel free to ask if anything's unclear!",
+                " I'm here if you have more questions!"
+            ]
+            response += random.choice(personal_touches)
+        
+        return response
+    
+    def _detect_user_emotion(self, user_input):
+        """Detect user's emotional state from their input"""
+        user_input_lower = user_input.lower()
+        
+        # Excited indicators
+        excited_words = ['excited', 'awesome', 'amazing', 'great', 'love', 'fantastic', 'wow', '!']
+        if any(word in user_input_lower for word in excited_words) or '!' in user_input:
+            return 'excited'
+        
+        # Frustrated indicators
+        frustrated_words = ['frustrated', 'annoying', 'hate', 'difficult', 'hard', 'confusing', 'stuck', 'problem']
+        if any(word in user_input_lower for word in frustrated_words):
+            return 'frustrated'
+        
+        # Confused indicators
+        confused_words = ['confused', 'don\'t understand', 'unclear', 'help', 'explain', 'what', 'how', '?']
+        if any(word in user_input_lower for word in confused_words) or '?' in user_input:
+            return 'confused'
+        
+        # Sad indicators
+        sad_words = ['sad', 'disappointed', 'upset', 'down', 'bad', 'terrible']
+        if any(word in user_input_lower for word in sad_words):
+            return 'sad'
+        
+        return 'neutral'
+    
+    def _update_conversation_mood(self, user_emotion):
+        """Update conversation mood based on user emotion"""
+        if user_emotion == 'excited':
+            self.conversation_mood = 'excited'
+        elif user_emotion == 'frustrated' or user_emotion == 'sad':
+            self.conversation_mood = 'concerned'
+        elif user_emotion == 'confused':
+            self.conversation_mood = 'helpful'
+        else:
+            self.conversation_mood = 'neutral'
+    
+    def _add_conversation_continuity(self):
+        """Add conversation continuity based on history"""
+        if len(self.conversation_history) < 4:
+            return ""
+        
+        # Check if user is asking similar questions
+        recent_questions = [entry['user'] for entry in self.conversation_history[-4:] if 'user' in entry]
+        
+        if len(recent_questions) >= 2:
+            # Simple similarity check
+            last_question = recent_questions[-1].lower()
+            second_last_question = recent_questions[-2].lower()
+            
+            common_words = set(last_question.split()) & set(second_last_question.split())
+            if len(common_words) >= 2:
+                continuity_phrases = [
+                    "I see you're really diving deep into this topic! That's awesome!",
+                    "You're asking some great follow-up questions!",
+                    "I love how you're exploring this thoroughly!",
+                    "You're really getting into the details - I like that!"
+                ]
+                import random
+                return random.choice(continuity_phrases)
+        
+        return ""
+    
+    def adjust_personality(self, trait, value):
+        """Adjust personality traits dynamically"""
+        if trait in self.personality_traits and 0 <= value <= 1:
+            self.personality_traits[trait] = value
+            return f"Adjusted {trait} to {value}"
+        return "Invalid trait or value"
+    
+    def get_personality_info(self):
+        """Get current personality settings"""
+        return {
+            'traits': self.personality_traits,
+            'mood': self.conversation_mood,
+            'conversation_length': len(self.conversation_history)
+        }
+    
     def clear_conversation(self):
         """Clear conversation history"""
         self.conversation_history = []
         self.user_context = {}
         self.conversation_topics = []
         self.follow_up_questions = []
+        self.conversation_mood = 'neutral'
+        self.user_name = None
+        self.conversation_start_time = None
         return "Conversation cleared! Starting fresh."
     
     def _similarity_based_response(self, user_input):
