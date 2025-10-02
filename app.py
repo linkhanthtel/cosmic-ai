@@ -164,6 +164,34 @@ def get_conversation_history():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/personality', methods=['GET'])
+def get_personality():
+    try:
+        personality_info = chatbot.get_personality_info()
+        return jsonify(personality_info)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/personality/adjust', methods=['POST'])
+def adjust_personality():
+    try:
+        data = request.get_json()
+        trait = data.get('trait')
+        value = data.get('value')
+        
+        if not trait or value is None:
+            return jsonify({'error': 'Trait and value are required'}), 400
+        
+        result = chatbot.adjust_personality(trait, value)
+        return jsonify({
+            'message': result,
+            'personality': chatbot.get_personality_info()
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Create necessary directories
     os.makedirs('templates', exist_ok=True)
