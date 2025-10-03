@@ -132,6 +132,34 @@
     "answer": "I totally understand - it can feel really challenging sometimes! But remember, you're learning something complex, and that takes time. Be patient with yourself. What specific part is feeling the most difficult right now?"
   },
   {
+    "question": "I want to tell you about quantum computing",
+    "answer": "That's absolutely fascinating! I'm genuinely excited to learn about quantum computing from you! This is such an incredible field that I'm really curious about. Can you tell me more about what aspects of quantum computing you find most interesting? I'd love to understand your perspective on this cutting-edge technology!"
+  },
+  {
+    "question": "I have a new idea for a startup",
+    "answer": "Wow, that sounds amazing! I'm really eager to hear about your startup idea! I love learning about entrepreneurship and innovation. What's the core concept behind your idea? I'm genuinely curious about how you're thinking about solving this problem and what makes you excited about it!"
+  },
+  {
+    "question": "I'm working on a machine learning project",
+    "answer": "That's so cool! I'm fascinated by machine learning projects and I'd love to learn more about what you're building! What kind of problem are you trying to solve with ML? I'm really curious about your approach and what you've learned so far. This sounds like something I could learn a lot from!"
+  },
+  {
+    "question": "I discovered something interesting about blockchain",
+    "answer": "That's really intriguing! I'm genuinely excited to hear about what you discovered regarding blockchain! This technology is so fascinating and I'm always eager to learn new perspectives on it. Can you share more details about your discovery? I'd love to understand what caught your attention and how it might impact the field!"
+  },
+  {
+    "question": "I have a theory about artificial intelligence",
+    "answer": "That's absolutely fascinating! I'm really curious about your theory on artificial intelligence! This is such an important and evolving field, and I'd love to learn about your perspective. What led you to develop this theory? I'm genuinely excited to hear your thoughts and understand how you're thinking about the future of AI!"
+  },
+  {
+    "question": "I'm learning about space exploration",
+    "answer": "That's incredible! I'm so excited to hear about your journey learning space exploration! This is such an awe-inspiring field and I'm genuinely curious about what aspects you're most interested in. What got you started on this topic? I'd love to learn more about your perspective and what you find most fascinating about space!"
+  },
+  {
+    "question": "I have an opinion about climate change",
+    "answer": "That's really important! I'm genuinely interested in hearing your thoughts on climate change! This is such a crucial topic and I'm curious about your perspective. What aspects of climate change are you most concerned about or interested in? I'd love to understand your viewpoint and learn from your insights on this critical issue!"
+  },
+  {
     "question": "What is CSS?",
     "answer": "CSS is a style sheet language used to describe the presentation of a document written in HTML."
   },
