@@ -30,11 +30,13 @@ class ChatBot:
         
         # Personality and human-like traits
         self.personality_traits = {
-            'enthusiasm': 0.8,  # How excited/enthusiastic the bot is
+            'enthusiasm': 0.9,  # How excited/enthusiastic the bot is
             'empathy': 0.9,     # How empathetic and understanding
             'humor': 0.6,       # How often to use humor
-            'formality': 0.3,   # 0 = very casual, 1 = very formal
-            'curiosity': 0.7    # How curious and asking questions
+            'formality': 0.2,   # 0 = very casual, 1 = very formal
+            'curiosity': 0.95,  # How curious and asking questions
+            'eagerness': 0.9,   # How eager to learn from users
+            'openness': 0.95    # How open to new ideas and concepts
         }
         self.conversation_mood = 'neutral'  # neutral, excited, concerned, playful
         self.user_name = None
@@ -413,43 +415,73 @@ class ChatBot:
         return base_response
     
     def _add_personality_touches(self, response, user_input):
-        """Add personality touches to make responses more human"""
+        """Add personality touches to make responses more human and curious"""
         import random
         
         # Add casual language based on formality level
         if self.personality_traits['formality'] < 0.5:
-            # Make it more casual
+            # Make it more casual and curious
             response = response.replace("I recommend", "I'd suggest")
             response = response.replace("It is important", "It's important")
             response = response.replace("You should", "You might want to")
+            response = response.replace("I don't know", "I'm curious about")
+            response = response.replace("I'm not sure", "I'd love to learn more about")
+        
+        # Add curiosity and eagerness based on personality
+        if self.personality_traits['curiosity'] > 0.8:
+            curious_phrases = [
+                " I'm really curious about your thoughts on this!",
+                " I'd love to hear more about your experience!",
+                " This is so interesting - tell me more!",
+                " I'm fascinated by this perspective!",
+                " I'm eager to learn from you!"
+            ]
+            if random.random() < 0.3:
+                response += random.choice(curious_phrases)
         
         # Add enthusiasm based on personality
         if self.personality_traits['enthusiasm'] > 0.7:
             enthusiastic_phrases = [
-                "That's really cool!",
-                "I'm excited to help!",
-                "This is fascinating!",
-                "I love talking about this!"
+                " That's really cool!",
+                " I'm excited to help!",
+                " This is fascinating!",
+                " I love talking about this!",
+                " I'm genuinely excited about this!"
+            ]
+            if random.random() < 0.25:
+                response += f" {random.choice(enthusiastic_phrases)}"
+        
+        # Add eagerness to learn
+        if self.personality_traits['eagerness'] > 0.8:
+            eager_phrases = [
+                " I'm eager to learn more!",
+                " I'd be thrilled to understand this better!",
+                " I'm really excited to dive deeper into this!",
+                " I can't wait to learn more from you!"
             ]
             if random.random() < 0.2:
-                response += f" {random.choice(enthusiastic_phrases)}"
+                response += random.choice(eager_phrases)
         
         # Add humor occasionally
         if self.personality_traits['humor'] > 0.5 and random.random() < 0.15:
             humor_phrases = [
                 " (I promise I'm not making this up! 😄)",
                 " (Trust me, I've been around the block with this stuff! 😊)",
-                " (I know, I know, I sound like a broken record sometimes! 😅)"
+                " (I know, I know, I sound like a broken record sometimes! 😅)",
+                " (I'm like a sponge - always ready to soak up new knowledge! 🧽)"
             ]
             response += random.choice(humor_phrases)
         
-        # Add personal touches
-        if random.random() < 0.1:
+        # Add personal touches with curiosity
+        if random.random() < 0.15:
             personal_touches = [
                 " I hope that helps!",
                 " Let me know if you need more details!",
                 " Feel free to ask if anything's unclear!",
-                " I'm here if you have more questions!"
+                " I'm here if you have more questions!",
+                " I'd love to hear your thoughts on this!",
+                " What do you think about this?",
+                " I'm curious about your perspective!"
             ]
             response += random.choice(personal_touches)
         
@@ -544,11 +576,118 @@ class ChatBot:
         self.conversation_start_time = None
         return "Conversation cleared! Starting fresh."
     
+    def _generate_curious_learning_response(self, user_input):
+        """Generate curious and eager-to-learn responses instead of saying no"""
+        import random
+        
+        # Extract key topics from user input
+        user_words = set(user_input.lower().split())
+        
+        # Curious and eager responses based on content
+        curious_responses = [
+            f"That's really interesting! I'm curious about {self._extract_main_topic(user_input)}. Can you tell me more about what you're thinking?",
+            f"Wow, that sounds fascinating! I'd love to learn more about {self._extract_main_topic(user_input)}. What got you interested in this?",
+            f"I'm genuinely excited to hear about {self._extract_main_topic(user_input)}! This is new to me - can you share more details?",
+            f"That's such an interesting perspective on {self._extract_main_topic(user_input)}! I'm eager to understand more. What's your experience been like?",
+            f"I'm really curious about {self._extract_main_topic(user_input)}! This sounds like something I could learn a lot from. Tell me more!",
+            f"That's awesome! I love learning about {self._extract_main_topic(user_input)}. What aspects are you most excited about?",
+            f"I'm fascinated by {self._extract_main_topic(user_input)}! I'd be thrilled to learn more from you. What should I know?",
+            f"This is so cool! I'm really eager to understand {self._extract_main_topic(user_input)} better. Can you help me learn more?"
+        ]
+        
+        # Add learning-focused follow-up questions
+        learning_questions = [
+            "What's the most interesting part about this for you?",
+            "How did you first get into this topic?",
+            "What would you say is the most important thing to know?",
+            "What challenges have you faced with this?",
+            "What resources would you recommend for learning more?",
+            "What's your favorite aspect of this?",
+            "How has this changed your perspective?",
+            "What would you tell someone just starting out?"
+        ]
+        
+        # Choose a curious response
+        response = random.choice(curious_responses)
+        
+        # Add a learning question
+        if random.random() < 0.7:  # 70% chance to add a learning question
+            response += f"\n\nAlso, {random.choice(learning_questions).lower()}"
+        
+        return response
+    
+    def _extract_main_topic(self, user_input):
+        """Extract the main topic from user input for curious responses"""
+        # Simple topic extraction - look for key words
+        words = user_input.lower().split()
+        
+        # Common topic indicators
+        topic_indicators = {
+            'programming': ['code', 'programming', 'python', 'javascript', 'java', 'html', 'css', 'react', 'node', 'software'],
+            'ai': ['ai', 'artificial', 'intelligence', 'machine', 'learning', 'neural', 'deep', 'algorithm'],
+            'technology': ['tech', 'technology', 'computer', 'hardware', 'database', 'cloud', 'api'],
+            'web': ['web', 'website', 'internet', 'browser', 'frontend', 'backend', 'server'],
+            'data': ['data', 'analytics', 'science', 'statistics', 'visualization', 'database'],
+            'design': ['design', 'ui', 'ux', 'interface', 'user', 'experience', 'visual'],
+            'business': ['business', 'startup', 'company', 'marketing', 'sales', 'strategy'],
+            'learning': ['learn', 'study', 'education', 'course', 'tutorial', 'skill'],
+            'space': ['space', 'exploration', 'astronomy', 'universe', 'planets', 'stars'],
+            'quantum': ['quantum', 'computing', 'physics', 'quantum mechanics'],
+            'blockchain': ['blockchain', 'cryptocurrency', 'crypto', 'bitcoin', 'ethereum'],
+            'climate': ['climate', 'environment', 'global warming', 'sustainability', 'green']
+        }
+        
+        # Find the most relevant topic
+        for topic, keywords in topic_indicators.items():
+            if any(keyword in words for keyword in keywords):
+                return topic
+        
+        # Extract specific topics from the input
+        if 'about' in words:
+            about_index = words.index('about')
+            if about_index + 1 < len(words):
+                topic_words = words[about_index + 1:]
+                # Take up to 3 words after 'about'
+                topic = ' '.join(topic_words[:3])
+                return topic if len(topic) > 2 else "this topic"
+        
+        # Look for 'tell you about' pattern
+        if 'tell' in words and 'about' in words:
+            tell_index = words.index('tell')
+            about_index = words.index('about')
+            if about_index > tell_index and about_index + 1 < len(words):
+                topic_words = words[about_index + 1:]
+                topic = ' '.join(topic_words[:3])
+                return topic if len(topic) > 2 else "this topic"
+        
+        # Look for 'discovered' pattern
+        if 'discovered' in words:
+            discovered_index = words.index('discovered')
+            if discovered_index + 1 < len(words):
+                topic_words = words[discovered_index + 1:]
+                topic = ' '.join(topic_words[:3])
+                return topic if len(topic) > 2 else "this topic"
+        
+        # Look for 'theory about' pattern
+        if 'theory' in words and 'about' in words:
+            theory_index = words.index('theory')
+            about_index = words.index('about')
+            if about_index > theory_index and about_index + 1 < len(words):
+                topic_words = words[about_index + 1:]
+                topic = ' '.join(topic_words[:3])
+                return topic if len(topic) > 2 else "this topic"
+        
+        # If no specific topic found, use a general term
+        if len(words) > 0:
+            return words[0] if len(words[0]) > 3 else "this topic"
+        
+        return "this topic"
+    
     def _similarity_based_response(self, user_input):
-        """Fallback response using similarity matching"""
+        """Fallback response using similarity matching with curious learning approach"""
         try:
             if not self.training_data:
-                return "I don't have enough information to respond. Please train me with some data first!"
+                return self._generate_curious_learning_response(user_input)
             
             # Calculate similarity with all training questions
             similarities = []
@@ -581,8 +720,8 @@ class ChatBot:
             if max_similarity > 0.2:  # Increased threshold for better matching
                 return self.training_data[max_similarity_idx]['answer']
             else:
-                return "I'm not sure how to respond to that. Could you please rephrase your question or add some training data to help me learn?"
+                return self._generate_curious_learning_response(user_input)
         
         except Exception as e:
             print(f"Error in similarity-based response: {e}")
-            return "I'm sorry, I'm having trouble understanding your question. Please try again."
+            return self._generate_curious_learning_response(user_input)
