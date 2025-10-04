@@ -36,10 +36,6 @@
     "answer": "You're welcome! Is there anything else I can help you with?"
   },
   {
-    "question": "Thank you",
-    "answer": "You're welcome! Is there anything else I can help you with?"
-  },
-  {
     "question": "Bye",
     "answer": "Goodbye! Have a great day!"
   },
@@ -165,23 +161,35 @@
   },
   {
     "question": "What is JavaScript?",
-    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages."
+    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages. It's primarily used for frontend web development and can also be used for backend with Node.js."
   },
   {
     "question": "What is Python?",
-    "answer": "Python is a programming language that allows you to implement complex features on web pages."
+    "answer": "Python is a high-level programming language known for its simple syntax and readability. It's widely used for web development, data science, artificial intelligence, automation, and general-purpose programming."
   },
   {
-    "question": "What is React?",
-    "answer": "React is a library for building user interfaces."
+    "question": "What is Java?",
+    "answer": "Java is a high-level, object-oriented programming language that is platform-independent. It's widely used for enterprise applications, Android development, and large-scale systems."
   },
   {
-    "question": "What is Node.js?",
-    "answer": "Node.js is a runtime environment for executing JavaScript code outside of a browser."
+    "question": "What is C++?",
+    "answer": "C++ is a general-purpose programming language that extends C with object-oriented features. It's used for system programming, game development, and performance-critical applications."
   },
   {
     "question": "What is SQL?",
-    "answer": "SQL is a standard language for managing relational databases."
+    "answer": "SQL (Structured Query Language) is a programming language designed for managing and manipulating relational databases. It's used to create, read, update, and delete data in databases."
+  },
+  {
+    "question": "What is Git?",
+    "answer": "Git is a distributed version control system used to track changes in source code during software development. It allows multiple developers to collaborate on projects and maintain code history."
+  },
+  {
+    "question": "What is React?",
+    "answer": "React is a JavaScript library for building user interfaces, particularly web applications. It's developed by Facebook and uses a component-based architecture for creating interactive UIs."
+  },
+  {
+    "question": "What is Node.js?",
+    "answer": "Node.js is a JavaScript runtime environment that allows you to run JavaScript on the server side. It's built on Chrome's V8 JavaScript engine and is commonly used for backend web development."
   },
   {
     "question": "What is MongoDB?",

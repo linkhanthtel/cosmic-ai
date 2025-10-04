@@ -684,7 +684,7 @@ class ChatBot:
         return "this topic"
     
     def _similarity_based_response(self, user_input):
-        """Fallback response using similarity matching with curious learning approach"""
+        """Fallback response using similarity matching with improved accuracy"""
         try:
             if not self.training_data:
                 return self._generate_curious_learning_response(user_input)
@@ -700,16 +700,27 @@ class ChatBot:
                 if user_input_lower == question_lower:
                     return item['answer']
                 
-                # Word overlap similarity
+                # Improved similarity calculation
                 user_words = set(user_input_lower.split())
                 question_words = set(question_lower.split())
                 
                 if len(user_words) == 0 or len(question_words) == 0:
                     similarity = 0
                 else:
+                    # Jaccard similarity (intersection over union)
                     intersection = len(user_words.intersection(question_words))
                     union = len(user_words.union(question_words))
-                    similarity = intersection / union if union > 0 else 0
+                    jaccard_similarity = intersection / union if union > 0 else 0
+                    
+                    # Additional check for key words (higher weight)
+                    key_word_matches = 0
+                    for word in user_words:
+                        if word in question_words:
+                            key_word_matches += 1
+                    
+                    # Weighted similarity: 70% Jaccard + 30% key word matches
+                    key_word_score = key_word_matches / len(user_words) if len(user_words) > 0 else 0
+                    similarity = 0.7 * jaccard_similarity + 0.3 * key_word_score
                 
                 similarities.append(similarity)
             
@@ -717,7 +728,8 @@ class ChatBot:
             max_similarity_idx = np.argmax(similarities)
             max_similarity = similarities[max_similarity_idx]
             
-            if max_similarity > 0.2:  # Increased threshold for better matching
+            # Higher confidence threshold for better accuracy
+            if max_similarity > 0.4:  # Increased threshold for better matching
                 return self.training_data[max_similarity_idx]['answer']
             else:
                 return self._generate_curious_learning_response(user_input)
