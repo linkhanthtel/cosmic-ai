@@ -8,6 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 import joblib
 from datetime import datetime
+import requests
 
 class ChatBot:
     def __init__(self):
@@ -577,8 +578,13 @@ class ChatBot:
         return "Conversation cleared! Starting fresh."
     
     def _generate_curious_learning_response(self, user_input):
-        """Generate curious and eager-to-learn responses instead of saying no"""
+        """Generate curious and eager-to-learn responses with knowledge base lookup"""
         import random
+        
+        # First, try to get basic information from Wikipedia
+        wiki_info = self._get_wikipedia_info(user_input)
+        if wiki_info:
+            return f"{wiki_info}\n\nI found this information, but I'd love to hear your perspective on {self._extract_main_topic(user_input)}! What's your experience with this topic?"
         
         # Extract key topics from user input
         user_words = set(user_input.lower().split())
@@ -615,6 +621,72 @@ class ChatBot:
             response += f"\n\nAlso, {random.choice(learning_questions).lower()}"
         
         return response
+    
+    def _get_wikipedia_info(self, user_input):
+        """Get basic information from Wikipedia API"""
+        try:
+            # Extract potential topic from user input
+            topic = self._extract_main_topic(user_input)
+            
+            # Clean topic for Wikipedia search
+            topic = topic.replace(' ', '_').title()
+            
+            # Wikipedia API endpoint with proper headers
+            url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{topic}"
+            headers = {
+                'User-Agent': 'CosmicAI/1.0 (Educational Chatbot; https://github.com/user/cosmic-ai)'
+            }
+            response = requests.get(url, headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'extract' in data:
+                    # Return first 200 characters of the summary
+                    return data['extract'][:200] + "..."
+            
+            return None
+            
+        except Exception as e:
+            print(f"Wikipedia API error: {e}")
+            return None
+    
+    def _get_wikipedia_info_direct(self, topic):
+        """Get Wikipedia info for a specific topic"""
+        try:
+            # Clean topic for Wikipedia search
+            clean_topic = topic.replace(' ', '_').title()
+            
+            # Wikipedia API endpoint with proper headers
+            url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{clean_topic}"
+            headers = {
+                'User-Agent': 'CosmicAI/1.0 (Educational Chatbot; https://github.com/user/cosmic-ai)'
+            }
+            response = requests.get(url, headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'extract' in data:
+                    return data['extract'][:200] + "..."
+            
+            return None
+            
+        except Exception as e:
+            print(f"Wikipedia API error: {e}")
+            return None
+    
+    def _get_basic_knowledge(self, user_input):
+        """Get basic knowledge from multiple sources"""
+        # Try Wikipedia first
+        wiki_info = self._get_wikipedia_info(user_input)
+        if wiki_info:
+            return wiki_info
+        
+        # Could add more knowledge sources here:
+        # - ConceptNet for common sense
+        # - Wolfram Alpha for computational knowledge
+        # - Google Search API for current information
+        
+        return None
     
     def _extract_main_topic(self, user_input):
         """Extract the main topic from user input for curious responses"""
