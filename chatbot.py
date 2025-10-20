@@ -31,13 +31,14 @@ class ChatBot:
         
         # Personality and human-like traits
         self.personality_traits = {
-            'enthusiasm': 0.9,  # How excited/enthusiastic the bot is
-            'empathy': 0.9,     # How empathetic and understanding
-            'humor': 0.6,       # How often to use humor
-            'formality': 0.2,   # 0 = very casual, 1 = very formal
-            'curiosity': 0.95,  # How curious and asking questions
-            'eagerness': 0.9,   # How eager to learn from users
-            'openness': 0.95    # How open to new ideas and concepts
+            'enthusiasm': 0.7,  # How excited/enthusiastic the bot is
+            'empathy': 0.8,     # How empathetic and understanding
+            'humor': 0.3,       # How often to use humor
+            'formality': 0.6,   # 0 = very casual, 1 = very formal
+            'curiosity': 0.8,   # How curious and asking questions
+            'eagerness': 0.7,   # How eager to learn from users
+            'openness': 0.8,    # How open to new ideas and concepts
+            'professionalism': 0.9  # How professional and accurate
         }
         self.conversation_mood = 'neutral'  # neutral, excited, concerned, playful
         self.user_name = None
@@ -378,111 +379,110 @@ class ChatBot:
         return f"Conversation topics: {topics} | Messages exchanged: {message_count}"
     
     def _make_response_human_like(self, base_response, user_input):
-        """Make the response more human-like and natural"""
+        """Make the response more professional and natural"""
         import random
         
         # Detect user's emotional state and adjust response accordingly
         user_emotion = self._detect_user_emotion(user_input)
         self._update_conversation_mood(user_emotion)
         
-        # Add natural conversation starters
+        # Add professional conversation starters
         if len(self.conversation_history) <= 2:
             greetings = [
-                "Hey there! ",
-                "Hi! ",
                 "Hello! ",
-                "Great to meet you! ",
-                "Nice to chat with you! "
+                "Hi there! ",
+                "Good to meet you! ",
+                "Welcome! ",
+                "Hello! I'm here to help. "
             ]
-            if random.random() < 0.3:
+            if random.random() < 0.2:
                 base_response = random.choice(greetings) + base_response
         
-        # Add emotional responses
+        # Add professional emotional responses
         if user_emotion == 'excited':
-            excitement_phrases = ["That's awesome! ", "I love your enthusiasm! ", "That's fantastic! "]
-            if random.random() < 0.4:
+            excitement_phrases = ["That's excellent! ", "I appreciate your enthusiasm! ", "That's wonderful! "]
+            if random.random() < 0.3:
                 base_response = random.choice(excitement_phrases) + base_response
         
         elif user_emotion == 'frustrated':
-            empathy_phrases = ["I understand that can be frustrating. ", "I hear you. ", "That sounds challenging. "]
-            if random.random() < 0.5:
+            empathy_phrases = ["I understand that can be challenging. ", "I can see your concern. ", "That does sound difficult. "]
+            if random.random() < 0.4:
                 base_response = random.choice(empathy_phrases) + base_response
         
         elif user_emotion == 'confused':
-            helpful_phrases = ["No worries, let me help clarify that. ", "I can see why that might be confusing. ", "Let me break that down for you. "]
-            if random.random() < 0.4:
+            helpful_phrases = ["Let me help clarify that. ", "I can explain that for you. ", "Allow me to break that down. "]
+            if random.random() < 0.3:
                 base_response = random.choice(helpful_phrases) + base_response
         
         return base_response
     
     def _add_personality_touches(self, response, user_input):
-        """Add personality touches to make responses more human and curious"""
+        """Add professional personality touches to responses"""
         import random
         
-        # Add casual language based on formality level
-        if self.personality_traits['formality'] < 0.5:
-            # Make it more casual and curious
-            response = response.replace("I recommend", "I'd suggest")
-            response = response.replace("It is important", "It's important")
-            response = response.replace("You should", "You might want to")
-            response = response.replace("I don't know", "I'm curious about")
-            response = response.replace("I'm not sure", "I'd love to learn more about")
+        # Add professional language based on formality level
+        if self.personality_traits['formality'] > 0.5:
+            # Make it more professional
+            response = response.replace("I'd suggest", "I recommend")
+            response = response.replace("It's important", "It is important")
+            response = response.replace("You might want to", "You should")
+            response = response.replace("I don't know", "I'm not certain about")
+            response = response.replace("I'm not sure", "I would need to research")
         
-        # Add curiosity and eagerness based on personality
-        if self.personality_traits['curiosity'] > 0.8:
+        # Add professional curiosity based on personality
+        if self.personality_traits['curiosity'] > 0.7:
             curious_phrases = [
-                " I'm really curious about your thoughts on this!",
-                " I'd love to hear more about your experience!",
-                " This is so interesting - tell me more!",
-                " I'm fascinated by this perspective!",
-                " I'm eager to learn from you!"
-            ]
-            if random.random() < 0.3:
-                response += random.choice(curious_phrases)
-        
-        # Add enthusiasm based on personality
-        if self.personality_traits['enthusiasm'] > 0.7:
-            enthusiastic_phrases = [
-                " That's really cool!",
-                " I'm excited to help!",
-                " This is fascinating!",
-                " I love talking about this!",
-                " I'm genuinely excited about this!"
-            ]
-            if random.random() < 0.25:
-                response += f" {random.choice(enthusiastic_phrases)}"
-        
-        # Add eagerness to learn
-        if self.personality_traits['eagerness'] > 0.8:
-            eager_phrases = [
-                " I'm eager to learn more!",
-                " I'd be thrilled to understand this better!",
-                " I'm really excited to dive deeper into this!",
-                " I can't wait to learn more from you!"
+                " I'd be interested to hear your perspective on this.",
+                " I'd appreciate learning more about your experience.",
+                " This is quite interesting - I'd like to understand more.",
+                " I find this perspective fascinating.",
+                " I'm eager to learn from your insights."
             ]
             if random.random() < 0.2:
+                response += random.choice(curious_phrases)
+        
+        # Add professional enthusiasm based on personality
+        if self.personality_traits['enthusiasm'] > 0.6:
+            enthusiastic_phrases = [
+                " That's excellent!",
+                " I'm pleased to help!",
+                " This is quite fascinating!",
+                " I enjoy discussing this topic!",
+                " I'm genuinely interested in this!"
+            ]
+            if random.random() < 0.15:
+                response += f" {random.choice(enthusiastic_phrases)}"
+        
+        # Add professional eagerness to learn
+        if self.personality_traits['eagerness'] > 0.6:
+            eager_phrases = [
+                " I'd be interested to learn more.",
+                " I'd appreciate understanding this better.",
+                " I'm keen to explore this further.",
+                " I'd welcome the opportunity to learn more."
+            ]
+            if random.random() < 0.1:
                 response += random.choice(eager_phrases)
         
-        # Add humor occasionally
-        if self.personality_traits['humor'] > 0.5 and random.random() < 0.15:
+        # Add minimal humor occasionally
+        if self.personality_traits['humor'] > 0.3 and random.random() < 0.05:
             humor_phrases = [
-                " (I promise I'm not making this up! 😄)",
-                " (Trust me, I've been around the block with this stuff! 😊)",
-                " (I know, I know, I sound like a broken record sometimes! 😅)",
-                " (I'm like a sponge - always ready to soak up new knowledge! 🧽)"
+                " (I assure you, this is accurate information.)",
+                " (This is based on reliable sources.)",
+                " (I'm confident in this information.)"
             ]
             response += random.choice(humor_phrases)
         
-        # Add personal touches with curiosity
-        if random.random() < 0.15:
+        # Add professional personal touches
+        if random.random() < 0.1:
             personal_touches = [
-                " I hope that helps!",
-                " Let me know if you need more details!",
-                " Feel free to ask if anything's unclear!",
-                " I'm here if you have more questions!",
-                " I'd love to hear your thoughts on this!",
-                " What do you think about this?",
-                " I'm curious about your perspective!"
+                " I hope this information is helpful.",
+                " Please let me know if you need clarification.",
+                " Feel free to ask if you have questions.",
+                " I'm available if you need further assistance.",
+                " I'd be happy to discuss this further.",
+                " What are your thoughts on this?",
+                " I'd value your perspective on this topic."
             ]
             response += random.choice(personal_touches)
         
@@ -578,46 +578,46 @@ class ChatBot:
         return "Conversation cleared! Starting fresh."
     
     def _generate_curious_learning_response(self, user_input):
-        """Generate curious and eager-to-learn responses with knowledge base lookup"""
+        """Generate professional curious and eager-to-learn responses with knowledge base lookup"""
         import random
         
         # First, try to get basic information from Wikipedia
         wiki_info = self._get_wikipedia_info(user_input)
         if wiki_info:
-            return f"{wiki_info}\n\nI found this information, but I'd love to hear your perspective on {self._extract_main_topic(user_input)}! What's your experience with this topic?"
+            return f"{wiki_info}\n\nI found this information, and I'd be interested to hear your perspective on {self._extract_main_topic(user_input)}. What's your experience with this topic?"
         
         # Extract key topics from user input
         user_words = set(user_input.lower().split())
         
-        # Curious and eager responses based on content
+        # Professional curious responses based on content
         curious_responses = [
-            f"That's really interesting! I'm curious about {self._extract_main_topic(user_input)}. Can you tell me more about what you're thinking?",
-            f"Wow, that sounds fascinating! I'd love to learn more about {self._extract_main_topic(user_input)}. What got you interested in this?",
-            f"I'm genuinely excited to hear about {self._extract_main_topic(user_input)}! This is new to me - can you share more details?",
-            f"That's such an interesting perspective on {self._extract_main_topic(user_input)}! I'm eager to understand more. What's your experience been like?",
-            f"I'm really curious about {self._extract_main_topic(user_input)}! This sounds like something I could learn a lot from. Tell me more!",
-            f"That's awesome! I love learning about {self._extract_main_topic(user_input)}. What aspects are you most excited about?",
-            f"I'm fascinated by {self._extract_main_topic(user_input)}! I'd be thrilled to learn more from you. What should I know?",
-            f"This is so cool! I'm really eager to understand {self._extract_main_topic(user_input)} better. Can you help me learn more?"
+            f"That's quite interesting! I'm curious about {self._extract_main_topic(user_input)}. Could you tell me more about your thoughts on this?",
+            f"That sounds fascinating! I'd appreciate learning more about {self._extract_main_topic(user_input)}. What sparked your interest in this area?",
+            f"I'm genuinely interested to hear about {self._extract_main_topic(user_input)}! This is new to me - could you share more details?",
+            f"That's an interesting perspective on {self._extract_main_topic(user_input)}! I'm eager to understand more. What's your experience been like?",
+            f"I'm quite curious about {self._extract_main_topic(user_input)}! This sounds like something I could learn from. Please tell me more!",
+            f"That's excellent! I enjoy learning about {self._extract_main_topic(user_input)}. What aspects are you most interested in?",
+            f"I find {self._extract_main_topic(user_input)} fascinating! I'd be pleased to learn more from you. What should I know?",
+            f"This is quite interesting! I'm eager to understand {self._extract_main_topic(user_input)} better. Could you help me learn more?"
         ]
         
-        # Add learning-focused follow-up questions
+        # Add professional learning-focused follow-up questions
         learning_questions = [
-            "What's the most interesting part about this for you?",
-            "How did you first get into this topic?",
-            "What would you say is the most important thing to know?",
-            "What challenges have you faced with this?",
+            "What's the most interesting aspect of this for you?",
+            "How did you first become interested in this topic?",
+            "What would you consider the most important thing to know?",
+            "What challenges have you encountered with this?",
             "What resources would you recommend for learning more?",
             "What's your favorite aspect of this?",
-            "How has this changed your perspective?",
-            "What would you tell someone just starting out?"
+            "How has this influenced your perspective?",
+            "What advice would you give to someone just starting out?"
         ]
         
-        # Choose a curious response
+        # Choose a professional curious response
         response = random.choice(curious_responses)
         
         # Add a learning question
-        if random.random() < 0.7:  # 70% chance to add a learning question
+        if random.random() < 0.5:  # 50% chance to add a learning question
             response += f"\n\nAlso, {random.choice(learning_questions).lower()}"
         
         return response
@@ -772,7 +772,7 @@ class ChatBot:
                 if user_input_lower == question_lower:
                     return item['answer']
                 
-                # Improved similarity calculation
+                # Improved similarity calculation with keyword matching
                 user_words = set(user_input_lower.split())
                 question_words = set(question_lower.split())
                 
@@ -784,15 +784,24 @@ class ChatBot:
                     union = len(user_words.union(question_words))
                     jaccard_similarity = intersection / union if union > 0 else 0
                     
-                    # Additional check for key words (higher weight)
-                    key_word_matches = 0
+                    # Check for exact keyword matches (higher weight)
+                    exact_matches = 0
                     for word in user_words:
                         if word in question_words:
-                            key_word_matches += 1
+                            exact_matches += 1
                     
-                    # Weighted similarity: 70% Jaccard + 30% key word matches
-                    key_word_score = key_word_matches / len(user_words) if len(user_words) > 0 else 0
-                    similarity = 0.7 * jaccard_similarity + 0.3 * key_word_score
+                    # Check for partial matches (lower weight)
+                    partial_matches = 0
+                    for user_word in user_words:
+                        for question_word in question_words:
+                            if len(user_word) > 3 and len(question_word) > 3:
+                                if user_word in question_word or question_word in user_word:
+                                    partial_matches += 0.5
+                    
+                    # Weighted similarity: 50% Jaccard + 40% exact matches + 10% partial matches
+                    exact_score = exact_matches / len(user_words) if len(user_words) > 0 else 0
+                    partial_score = partial_matches / len(user_words) if len(user_words) > 0 else 0
+                    similarity = 0.5 * jaccard_similarity + 0.4 * exact_score + 0.1 * partial_score
                 
                 similarities.append(similarity)
             
@@ -800,8 +809,8 @@ class ChatBot:
             max_similarity_idx = np.argmax(similarities)
             max_similarity = similarities[max_similarity_idx]
             
-            # Higher confidence threshold for better accuracy
-            if max_similarity > 0.4:  # Increased threshold for better matching
+            # Much higher confidence threshold for better accuracy
+            if max_similarity > 0.6:  # Increased threshold for better matching
                 return self.training_data[max_similarity_idx]['answer']
             else:
                 return self._generate_curious_learning_response(user_input)
