@@ -1,0 +1,97 @@
+CURRENT TRAINING PROCESS FLOW
+================================
+
+1. DATA PREPARATION
+   ┌─────────────────────────────────────┐
+   │ training_data.json                  │
+   │ ┌─────────────────────────────────┐ │
+   │ │ [                              │ │
+   │ │   {                            │ │
+   │ │     "question": "What is HTML?",│ │
+   │ │     "answer": "HTML is a..."   │ │
+   │ │   },                           │ │
+   │ │   ... (56 pairs)               │ │
+   │ │ ]                              │ │
+   │ └─────────────────────────────────┘ │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ Extract Questions & Answers         │
+   │ questions = ["What is HTML?", ...]  │
+   │ answers = ["HTML is a...", ...]     │
+   └─────────────────────────────────────┘
+
+2. TEXT VECTORIZATION
+   ┌─────────────────────────────────────┐
+   │ TF-IDF Vectorizer                   │
+   │ "What is HTML?" → [0.2, 0.0, 0.8,  │
+   │                    0.1, 0.3, ...]  │
+   │ (1000-dimensional vector)           │
+   └─────────────────────────────────────┘
+
+3. ANSWER ENCODING
+   ┌─────────────────────────────────────┐
+   │ Label Encoder                       │
+   │ "HTML is a markup language" → 5     │
+   │ "Python is a programming..." → 12   │
+   │ (Numerical labels)                  │
+   └─────────────────────────────────────┘
+
+4. MODEL TRAINING
+   ┌─────────────────────────────────────┐
+   │ Multinomial Naive Bayes             │
+   │ Learn patterns between:             │
+   │ Question Vectors → Answer Labels    │
+   │ [0.2,0.0,0.8...] → 5               │
+   └─────────────────────────────────────┘
+
+5. MODEL PERSISTENCE
+   ┌─────────────────────────────────────┐
+   │ Save Components                     │
+   │ ├── chatbot_model.pkl              │
+   │ ├── vectorizer.pkl                 │
+   │ └── label_encoder.pkl              │
+   └─────────────────────────────────────┘
+
+INFERENCE PROCESS (When User Asks Question)
+===========================================
+
+User: "What is Python?"
+         ↓
+   ┌─────────────────────────────────────┐
+   │ TF-IDF Vectorization                │
+   │ "What is Python?" → [0.1, 0.5, 0.2,│
+   │                    0.8, 0.0, ...]  │
+   └─────────────────────────────────────┘
+         ↓
+   ┌─────────────────────────────────────┐
+   │ Model Prediction                    │
+   │ [0.1,0.5,0.2...] → Label 12        │
+   └─────────────────────────────────────┘
+         ↓
+   ┌─────────────────────────────────────┐
+   │ Label Decoding                      │
+   │ Label 12 → "Python is a high-level │
+   │            programming language..."  │
+   └─────────────────────────────────────┘
+         ↓
+   ┌─────────────────────────────────────┐
+   │ Response Enhancement                │
+   │ Add personality, professionalism,   │
+   │ Wikipedia integration, etc.         │
+   └─────────────────────────────────────┘
+         ↓
+   Final Response: "Python is a high-level programming language..."
+
+WHAT THIS IS NOT:
+================
+❌ Fine-tuning: No pre-trained neural networks being adjusted
+❌ Training from scratch: No neural networks built from random weights
+❌ Deep learning: No backpropagation or gradient descent
+
+WHAT THIS IS:
+=============
+✅ Traditional ML Classification
+✅ Pattern matching between questions and answers
+✅ Statistical learning (Naive Bayes)
+✅ Rule-based with ML enhancement
