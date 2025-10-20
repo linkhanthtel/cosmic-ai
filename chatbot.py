@@ -756,61 +756,44 @@ class ChatBot:
         return "this topic"
     
     def _similarity_based_response(self, user_input):
-        """Fallback response using similarity matching with improved accuracy"""
+        """Fallback response using improved keyword matching with case insensitivity"""
         try:
             if not self.training_data:
                 return self._generate_curious_learning_response(user_input)
             
+            # Normalize input for better matching
+            user_input_normalized = self._normalize_text(user_input)
+            
             # Calculate similarity with all training questions
             similarities = []
-            user_input_lower = user_input.lower().strip()
             
             for item in self.training_data:
-                question_lower = item['question'].lower().strip()
+                question_normalized = self._normalize_text(item['question'])
                 
                 # Exact match check first
-                if user_input_lower == question_lower:
+                if user_input_normalized == question_normalized:
                     return item['answer']
                 
-                # Improved similarity calculation with keyword matching
-                user_words = set(user_input_lower.split())
-                question_words = set(question_lower.split())
+                # Calculate multiple similarity scores
+                similarity_scores = self._calculate_similarity_scores(user_input_normalized, question_normalized)
                 
-                if len(user_words) == 0 or len(question_words) == 0:
-                    similarity = 0
-                else:
-                    # Jaccard similarity (intersection over union)
-                    intersection = len(user_words.intersection(question_words))
-                    union = len(user_words.union(question_words))
-                    jaccard_similarity = intersection / union if union > 0 else 0
-                    
-                    # Check for exact keyword matches (higher weight)
-                    exact_matches = 0
-                    for word in user_words:
-                        if word in question_words:
-                            exact_matches += 1
-                    
-                    # Check for partial matches (lower weight)
-                    partial_matches = 0
-                    for user_word in user_words:
-                        for question_word in question_words:
-                            if len(user_word) > 3 and len(question_word) > 3:
-                                if user_word in question_word or question_word in user_word:
-                                    partial_matches += 0.5
-                    
-                    # Weighted similarity: 50% Jaccard + 40% exact matches + 10% partial matches
-                    exact_score = exact_matches / len(user_words) if len(user_words) > 0 else 0
-                    partial_score = partial_matches / len(user_words) if len(user_words) > 0 else 0
-                    similarity = 0.5 * jaccard_similarity + 0.4 * exact_score + 0.1 * partial_score
+                # Weighted combination of different similarity measures
+                final_similarity = (
+                    0.3 * similarity_scores['jaccard'] +
+                    0.3 * similarity_scores['exact_keywords'] +
+                    0.2 * similarity_scores['partial_keywords'] +
+                    0.1 * similarity_scores['word_order'] +
+                    0.1 * similarity_scores['semantic_keywords']
+                )
                 
-                similarities.append(similarity)
+                similarities.append(final_similarity)
             
             # Get the most similar question
             max_similarity_idx = np.argmax(similarities)
             max_similarity = similarities[max_similarity_idx]
             
-            # Much higher confidence threshold for better accuracy
-            if max_similarity > 0.6:  # Increased threshold for better matching
+            # Lower threshold for better matching but still accurate
+            if max_similarity > 0.3:  # Lowered threshold for better matching
                 return self.training_data[max_similarity_idx]['answer']
             else:
                 return self._generate_curious_learning_response(user_input)
@@ -818,3 +801,111 @@ class ChatBot:
         except Exception as e:
             print(f"Error in similarity-based response: {e}")
             return self._generate_curious_learning_response(user_input)
+    
+    def _normalize_text(self, text):
+        """Normalize text for better matching"""
+        import re
+        
+        # Convert to lowercase
+        text = text.lower().strip()
+        
+        # Remove punctuation but keep spaces
+        text = re.sub(r'[^\w\s]', ' ', text)
+        
+        # Remove extra spaces
+        text = ' '.join(text.split())
+        
+        return text
+    
+    def _calculate_similarity_scores(self, user_text, question_text):
+        """Calculate multiple similarity scores"""
+        user_words = set(user_text.split())
+        question_words = set(question_text.split())
+        
+        if len(user_words) == 0 or len(question_words) == 0:
+            return {
+                'jaccard': 0,
+                'exact_keywords': 0,
+                'partial_keywords': 0,
+                'word_order': 0,
+                'semantic_keywords': 0
+            }
+        
+        # 1. Jaccard similarity (intersection over union)
+        intersection = len(user_words.intersection(question_words))
+        union = len(user_words.union(question_words))
+        jaccard = intersection / union if union > 0 else 0
+        
+        # 2. Exact keyword matches
+        exact_matches = len(user_words.intersection(question_words))
+        exact_keywords = exact_matches / len(user_words) if len(user_words) > 0 else 0
+        
+        # 3. Partial keyword matches
+        partial_matches = 0
+        for user_word in user_words:
+            for question_word in question_words:
+                if len(user_word) > 2 and len(question_word) > 2:
+                    if user_word in question_word or question_word in user_word:
+                        partial_matches += 0.5
+        
+        partial_keywords = partial_matches / len(user_words) if len(user_words) > 0 else 0
+        
+        # 4. Word order similarity (sequence matching)
+        user_list = user_text.split()
+        question_list = question_text.split()
+        word_order = self._calculate_word_order_similarity(user_list, question_list)
+        
+        # 5. Semantic keyword matching (important words)
+        semantic_keywords = self._calculate_semantic_similarity(user_words, question_words)
+        
+        return {
+            'jaccard': jaccard,
+            'exact_keywords': exact_keywords,
+            'partial_keywords': partial_keywords,
+            'word_order': word_order,
+            'semantic_keywords': semantic_keywords
+        }
+    
+    def _calculate_word_order_similarity(self, user_list, question_list):
+        """Calculate similarity based on word order"""
+        if len(user_list) == 0 or len(question_list) == 0:
+            return 0
+        
+        # Find common words in order
+        common_sequence = []
+        user_idx = 0
+        question_idx = 0
+        
+        while user_idx < len(user_list) and question_idx < len(question_list):
+            if user_list[user_idx] == question_list[question_idx]:
+                common_sequence.append(user_list[user_idx])
+                user_idx += 1
+                question_idx += 1
+            elif user_list[user_idx] in question_list[question_idx:]:
+                question_idx += 1
+            else:
+                user_idx += 1
+        
+        return len(common_sequence) / max(len(user_list), len(question_list))
+    
+    def _calculate_semantic_similarity(self, user_words, question_words):
+        """Calculate similarity based on important/semantic keywords"""
+        # Important keywords that should have higher weight
+        important_keywords = {
+            'what', 'is', 'how', 'why', 'when', 'where', 'who', 'which',
+            'html', 'css', 'javascript', 'python', 'java', 'sql', 'git',
+            'programming', 'language', 'code', 'development', 'web',
+            'machine', 'learning', 'ai', 'artificial', 'intelligence',
+            'data', 'science', 'algorithm', 'database', 'server', 'client'
+        }
+        
+        # Find important words in both sets
+        user_important = user_words.intersection(important_keywords)
+        question_important = question_words.intersection(important_keywords)
+        
+        if len(user_important) == 0:
+            return 0
+        
+        # Calculate overlap of important words
+        important_overlap = len(user_important.intersection(question_important))
+        return important_overlap / len(user_important)
