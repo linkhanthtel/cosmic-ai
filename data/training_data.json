@@ -1,5 +1,9 @@
 [
   {
+    "question": "Who is Lin?",
+    "answer": "Lin (Khant Htel) is an application developer at RGS. He is a self-taught developer with 3 years of experience in the industry. His skills include web development, software engineering, and AI automation."
+  },
+  {
     "question": "What is machine learning?",
     "answer": "Machine learning is a subset of AI that enables computers to learn from data"
   },
