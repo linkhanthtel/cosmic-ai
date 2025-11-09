@@ -1,6 +1,6 @@
 # AI Chatbot Trainer
 
-A simple, self-trainable AI chatbot application that allows you to train and fine-tune your own chatbot with custom data. Built with Flask, scikit-learn, and a beautiful web interface.
+Cosmic AI is a personal project created to showcase my skills in artificial intelligence, web development, and user experience design. It features a conversational AI assistant with memory and contextual awareness, built to demonstrate practical implementation of modern AI technologies. This is an independent, non-commercial project and not affiliated with any enterprise.
 
 ## Features
 
