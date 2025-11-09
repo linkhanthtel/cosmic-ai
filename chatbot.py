@@ -197,6 +197,11 @@ class ChatBot:
     def _get_base_response(self, user_input):
         """Get the base response from the model"""
         try:
+            # First, try keyword-based matching (prioritize this)
+            keyword_response = self._keyword_based_response(user_input)
+            if keyword_response:
+                return keyword_response
+            
             # Transform user input
             user_vector = self.vectorizer.transform([user_input])
             
@@ -579,48 +584,17 @@ class ChatBot:
     
     def _generate_curious_learning_response(self, user_input):
         """Generate professional curious and eager-to-learn responses with knowledge base lookup"""
-        import random
-        
         # First, try to get basic information from Wikipedia
         wiki_info = self._get_wikipedia_info(user_input)
         if wiki_info:
             return f"{wiki_info}\n\nI found this information, and I'd be interested to hear your perspective on {self._extract_main_topic(user_input)}. What's your experience with this topic?"
         
-        # Extract key topics from user input
-        user_words = set(user_input.lower().split())
-        
-        # Professional curious responses based on content
-        curious_responses = [
-            f"That's quite interesting! I'm curious about {self._extract_main_topic(user_input)}. Could you tell me more about your thoughts on this?",
-            f"That sounds fascinating! I'd appreciate learning more about {self._extract_main_topic(user_input)}. What sparked your interest in this area?",
-            f"I'm genuinely interested to hear about {self._extract_main_topic(user_input)}! This is new to me - could you share more details?",
-            f"That's an interesting perspective on {self._extract_main_topic(user_input)}! I'm eager to understand more. What's your experience been like?",
-            f"I'm quite curious about {self._extract_main_topic(user_input)}! This sounds like something I could learn from. Please tell me more!",
-            f"That's excellent! I enjoy learning about {self._extract_main_topic(user_input)}. What aspects are you most interested in?",
-            f"I find {self._extract_main_topic(user_input)} fascinating! I'd be pleased to learn more from you. What should I know?",
-            f"This is quite interesting! I'm eager to understand {self._extract_main_topic(user_input)} better. Could you help me learn more?"
-        ]
-        
-        # Add professional learning-focused follow-up questions
-        learning_questions = [
-            "What's the most interesting aspect of this for you?",
-            "How did you first become interested in this topic?",
-            "What would you consider the most important thing to know?",
-            "What challenges have you encountered with this?",
-            "What resources would you recommend for learning more?",
-            "What's your favorite aspect of this?",
-            "How has this influenced your perspective?",
-            "What advice would you give to someone just starting out?"
-        ]
-        
-        # Choose a professional curious response
-        response = random.choice(curious_responses)
-        
-        # Add a learning question
-        if random.random() < 0.5:  # 50% chance to add a learning question
-            response += f"\n\nAlso, {random.choice(learning_questions).lower()}"
-        
-        return response
+        # Default fallback response
+        return self._default_fallback(user_input)
+    
+    def _default_fallback(self, user_input):
+        """Default fallback response when the system is unsure"""
+        return f"I am not sure about \"{user_input}\" what you asked."
     
     def _get_wikipedia_info(self, user_input):
         """Get basic information from Wikipedia API"""
@@ -754,6 +728,102 @@ class ChatBot:
             return words[0] if len(words[0]) > 3 else "this topic"
         
         return "this topic"
+    
+    def _keyword_based_response(self, user_input):
+        """Keyword-based matching: returns response if keywords match training data"""
+        try:
+            if not self.training_data:
+                return None
+            
+            # Normalize and extract keywords from user input
+            user_input_normalized = self._normalize_text(user_input)
+            user_words = set(user_input_normalized.split())
+            user_words_list = user_input_normalized.split()  # Keep order for question type matching
+            
+            # Question words that help identify question type (keep these for better matching)
+            question_words = {'where', 'what', 'how', 'when', 'who', 'why', 'which', 'whose'}
+            
+            # Remove common stop words that don't add meaning (but keep question words)
+            stop_words = {
+                'is', 'are', 'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+                'of', 'with', 'by', 'from', 'as', 'about', 'tell', 'me', 'explain', 'definition',
+                'does', 'do', 'can', 'could', 'would', 'should', 'will', 'this', 'that', 'these', 'those'
+            }
+            
+            # Extract meaningful keywords (words that are not stop words and have length > 2)
+            # But keep question words even if they're short
+            keywords = {word for word in user_words if (word not in stop_words and len(word) > 2) or word in question_words}
+            
+            # Extract question type from user input (first question word if present)
+            user_question_type = None
+            for word in user_words_list:
+                if word in question_words:
+                    user_question_type = word
+                    break
+            
+            # If no meaningful keywords found, return None to fall back to other methods
+            if not keywords:
+                return None
+            
+            # Find all training data entries that contain any of the keywords
+            matches = []
+            for item in self.training_data:
+                question_normalized = self._normalize_text(item['question'])
+                question_words_set = set(question_normalized.split())
+                question_words_list = question_normalized.split()
+                
+                # Count how many keywords match
+                matching_keywords = keywords.intersection(question_words_set)
+                
+                if matching_keywords:
+                    # Base match score: number of matching keywords / total keywords
+                    base_score = len(matching_keywords) / len(keywords)
+                    
+                    # Bonus for question type matching (if user asked "where", prioritize "where" questions)
+                    question_type_bonus = 0.0
+                    if user_question_type:
+                        for word in question_words_list:
+                            if word == user_question_type:
+                                question_type_bonus = 0.3  # Significant bonus for matching question type
+                                break
+                    
+                    # Bonus for exact phrase matching (if user input is contained in question)
+                    phrase_bonus = 0.0
+                    if user_input_normalized in question_normalized:
+                        phrase_bonus = 0.2
+                    
+                    # Bonus for shorter questions (more specific matches)
+                    length_bonus = 0.0
+                    if len(question_words_list) <= len(user_words_list) + 2:
+                        length_bonus = 0.1
+                    
+                    # Final score with bonuses
+                    final_score = base_score + question_type_bonus + phrase_bonus + length_bonus
+                    # Cap at 1.0
+                    final_score = min(final_score, 1.0)
+                    
+                    matches.append({
+                        'item': item,
+                        'score': final_score,
+                        'base_score': base_score,
+                        'matching_keywords': matching_keywords
+                    })
+            
+            # If we have matches, return the best one
+            if matches:
+                # Sort by final score (highest first), then by base score, then by number of matching keywords
+                matches.sort(key=lambda x: (x['score'], x['base_score'], len(x['matching_keywords'])), reverse=True)
+                best_match = matches[0]
+                
+                # Return the answer if match score is reasonable (at least 30% of keywords match)
+                if best_match['base_score'] >= 0.3:
+                    return best_match['item']['answer']
+            
+            return None
+        
+        except Exception as e:
+            print(f"Error in keyword-based response: {e}")
+            return None
     
     def _similarity_based_response(self, user_input):
         """Fallback response using improved keyword matching with case insensitivity"""
