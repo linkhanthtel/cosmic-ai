@@ -116,10 +116,6 @@
     "answer": "You're very welcome! I'm really happy I could help. That's what I'm here for! Feel free to come back anytime if you have more questions - I genuinely enjoy helping out!"
   },
   {
-    "question": "I hate this",
-    "answer": "I can tell you're really frustrated, and I understand that feeling. Sometimes coding can be really annoying when things don't work. Take a deep breath - we can work through this together. What's making you feel this way?"
-  },
-  {
     "question": "Wow, that's cool!",
     "answer": "I know, right?! I love when people get excited about this stuff! It's pretty amazing what you can do with code once you understand it. What part did you find the most interesting?"
   },
@@ -200,22 +196,6 @@
     "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
   },
   {
-    "question": "Explain HTML",
-    "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
-  },
-  {
-    "question": "HTML definition",
-    "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
-  },
-  {
-    "question": "Tell me about Python",
-    "answer": "Python is a high-level programming language known for its simple syntax and readability. It's widely used for web development, data science, artificial intelligence, automation, and general-purpose programming."
-  },
-  {
-    "question": "Explain Python",
-    "answer": "Python is a high-level programming language known for its simple syntax and readability. It's widely used for web development, data science, artificial intelligence, automation, and general-purpose programming."
-  },
-  {
     "question": "Python definition",
     "answer": "Python is a high-level programming language known for its simple syntax and readability. It's widely used for web development, data science, artificial intelligence, automation, and general-purpose programming."
   },
@@ -224,35 +204,11 @@
     "answer": "JavaScript is a programming language that allows you to implement complex features on web pages. It's primarily used for frontend web development and can also be used for backend with Node.js."
   },
   {
-    "question": "Explain JavaScript",
-    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages. It's primarily used for frontend web development and can also be used for backend with Node.js."
-  },
-  {
-    "question": "JavaScript definition",
-    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages. It's primarily used for frontend web development and can also be used for backend with Node.js."
-  },
-  {
-    "question": "Tell me about CSS",
-    "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
-  },
-  {
     "question": "Explain CSS",
     "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
   },
   {
-    "question": "CSS definition",
-    "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
-  },
-  {
     "question": "Tell me about machine learning",
-    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
-  },
-  {
-    "question": "Explain machine learning",
-    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
-  },
-  {
-    "question": "Machine learning definition",
     "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
   },
   {
