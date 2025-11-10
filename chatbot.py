@@ -776,41 +776,60 @@ class ChatBot:
                 matching_keywords = keywords.intersection(question_words_set)
                 
                 if matching_keywords:
+                    # Check if this question has the same question type
+                    question_has_type = False
+                    if user_question_type:
+                        question_has_type = user_question_type in question_words_set
+                    
                     # Base match score: number of matching keywords / total keywords
                     base_score = len(matching_keywords) / len(keywords)
                     
-                    # Bonus for question type matching (if user asked "where", prioritize "where" questions)
+                    # STRONG bonus for question type matching (if user asked "where", prioritize "where" questions)
                     question_type_bonus = 0.0
-                    if user_question_type:
-                        for word in question_words_list:
-                            if word == user_question_type:
-                                question_type_bonus = 0.3  # Significant bonus for matching question type
-                                break
+                    if user_question_type and question_has_type:
+                        question_type_bonus = 0.5  # Very strong bonus for matching question type
+                    
+                    # Penalty for missing question type when user asked with one
+                    question_type_penalty = 0.0
+                    if user_question_type and not question_has_type:
+                        question_type_penalty = -0.4  # Strong penalty for missing question type
                     
                     # Bonus for exact phrase matching (if user input is contained in question)
                     phrase_bonus = 0.0
                     if user_input_normalized in question_normalized:
-                        phrase_bonus = 0.2
+                        phrase_bonus = 0.3
                     
                     # Bonus for shorter questions (more specific matches)
                     length_bonus = 0.0
                     if len(question_words_list) <= len(user_words_list) + 2:
                         length_bonus = 0.1
                     
-                    # Final score with bonuses
-                    final_score = base_score + question_type_bonus + phrase_bonus + length_bonus
-                    # Cap at 1.0
-                    final_score = min(final_score, 1.0)
+                    # Final score with bonuses and penalties
+                    final_score = base_score + question_type_bonus + question_type_penalty + phrase_bonus + length_bonus
+                    # Ensure score doesn't go below 0
+                    final_score = max(0.0, final_score)
                     
                     matches.append({
                         'item': item,
                         'score': final_score,
                         'base_score': base_score,
-                        'matching_keywords': matching_keywords
+                        'matching_keywords': matching_keywords,
+                        'has_question_type': question_has_type
                     })
             
-            # If we have matches, return the best one
+            # If we have matches, filter and sort them
             if matches:
+                # If user asked with a question type, prioritize matches that have it
+                if user_question_type:
+                    # Separate matches with and without question type
+                    matches_with_type = [m for m in matches if m['has_question_type']]
+                    matches_without_type = [m for m in matches if not m['has_question_type']]
+                    
+                    # If we have matches with the question type, only use those
+                    if matches_with_type:
+                        matches = matches_with_type
+                    # Otherwise, use all matches (fallback)
+                
                 # Sort by final score (highest first), then by base score, then by number of matching keywords
                 matches.sort(key=lambda x: (x['score'], x['base_score'], len(x['matching_keywords'])), reverse=True)
                 best_match = matches[0]
