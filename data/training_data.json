@@ -5,7 +5,7 @@
   },
   {
     "question": "What is machine learning?",
-    "answer": "Machine learning is a subset of AI that enables computers to learn from data"
+    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
   },
   {
     "question": "How does AI work?",
@@ -36,20 +36,16 @@
     "answer": "Goodbye! Have a great day!"
   },
   {
-    "question": "Thanks",
-    "answer": "You're welcome! Is there anything else I can help you with?"
-  },
-  {
-    "question": "Bye",
-    "answer": "Goodbye! Have a great day!"
-  },
-  {
     "question": "See you later",
     "answer": "See you later! Take care!"
   },
   {
     "question": "What is HTML?",
-    "answer": "HTML is a markup language used to create web pages."
+    "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
+  },
+  {
+    "question": "Tell me about HTML",
+    "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
   },
   {
     "question": "I want to learn Python programming",
@@ -157,7 +153,11 @@
   },
   {
     "question": "What is CSS?",
-    "answer": "CSS is a style sheet language used to describe the presentation of a document written in HTML."
+    "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
+  },
+  {
+    "question": "Explain CSS",
+    "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
   },
   {
     "question": "What is JavaScript?",
@@ -190,26 +190,6 @@
   {
     "question": "What is Node.js?",
     "answer": "Node.js is a JavaScript runtime environment that allows you to run JavaScript on the server side. It's built on Chrome's V8 JavaScript engine and is commonly used for backend web development."
-  },
-  {
-    "question": "Tell me about HTML",
-    "answer": "HTML (HyperText Markup Language) is a markup language used to create the structure and content of web pages. It uses tags to define elements like headings, paragraphs, links, and images."
-  },
-  {
-    "question": "Python definition",
-    "answer": "Python is a high-level programming language known for its simple syntax and readability. It's widely used for web development, data science, artificial intelligence, automation, and general-purpose programming."
-  },
-  {
-    "question": "Tell me about JavaScript",
-    "answer": "JavaScript is a programming language that allows you to implement complex features on web pages. It's primarily used for frontend web development and can also be used for backend with Node.js."
-  },
-  {
-    "question": "Explain CSS",
-    "answer": "CSS (Cascading Style Sheets) is a style sheet language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of web pages."
-  },
-  {
-    "question": "Tell me about machine learning",
-    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions from data without being explicitly programmed. It includes supervised learning, unsupervised learning, and reinforcement learning."
   },
   {
     "question": "What is MongoDB?",
