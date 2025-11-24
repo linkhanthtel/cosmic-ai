@@ -11,6 +11,10 @@ chatbot = ChatBot()
 
 @app.route('/')
 def index():
+    return render_template('home.html')
+
+@app.route('/chat')
+def chat_page():
     return render_template('chat.html')
 
 
