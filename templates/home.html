@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Cosmic AI{% endblock %}
+
+{% block content %}
+<div style="flex: 1; overflow-y: auto; padding: 40px 32px;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 48px;">
+            <h1 style="font-size: 48px; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, var(--accent-blue), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Welcome to Cosmic AI
+            </h1>
+            <p style="font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+                Your intelligent AI platform with multiple powerful features
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px;">
+            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
+                <div style="width: 48px; height: 48px; background: rgba(96, 165, 250, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">AI Chat</h3>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+                    Intelligent conversational AI with memory, context awareness, and personality traits.
+                </p>
+                <a href="/chat" style="display: inline-block; color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 500;">
+                    Try it now →
+                </a>
+            </div>
+
+            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
+                <div style="width: 48px; height: 48px; background: rgba(167, 139, 250, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">More Features</h3>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+                    Additional AI features coming soon. Stay tuned for updates!
+                </p>
+                <span style="display: inline-block; color: var(--text-muted); font-size: 14px;">
+                    Coming soon
+                </span>
+            </div>
+        </div>
+
+        <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 32px;">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">About Cosmic AI</h2>
+            <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                Cosmic AI is a comprehensive AI platform designed to provide intelligent, context-aware interactions. 
+                Our AI Chat feature uses advanced machine learning techniques to understand and respond to your queries 
+                with personality, memory, and emotional intelligence.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 24px;">
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Context Aware</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Remembers conversation history and maintains context</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Personality</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Customizable personality traits for natural interactions</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Intelligent</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Advanced keyword matching and similarity algorithms</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
