@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Summarizer - Cosmic AI{% endblock %}
+
+{% block content %}
+<style>
+    .summarizer-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        overflow-y: auto;
+        min-height: 100vh;
+    }
+
+    .summarizer-header {
+        margin-bottom: 32px;
+        text-align: center;
+    }
+
+    .summarizer-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, var(--accent-blue), #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .summarizer-header p {
+        font-size: 16px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .upload-section {
+        background: var(--navy-primary);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .file-upload-area {
+        border: 2px dashed var(--border);
+        border-radius: 16px;
+        padding: 48px 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: var(--navy-secondary);
+    }
+
+    .file-upload-area:hover {
+        border-color: var(--accent-blue);
+        background: rgba(96, 165, 250, 0.05);
+    }
+
+    .file-upload-area.dragover {
+        border-color: var(--accent-blue);
+        background: rgba(96, 165, 250, 0.1);
+    }
+
+    .file-upload-area input[type="file"] {
+        display: none;
+    }
+
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        background: var(--navy-secondary);
+        border: 2px solid var(--accent-blue);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-blue);
+        position: relative;
+    }
+
+    .upload-icon::before {
+        content: "";
+        width: 32px;
+        height: 40px;
+        border: 2px solid var(--accent-blue);
+        border-radius: 4px;
+        background: var(--navy-primary);
+    }
+
+    .upload-icon::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 2px;
+        background: var(--accent-blue);
+        border-radius: 1px;
+    }
+
+    .upload-text {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .upload-hint {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+    }
+
+    .file-info {
+        display: none;
+        margin-top: 16px;
+        padding: 16px;
+        background: var(--navy-secondary);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+
+    .file-info.show {
+        display: block;
+    }
+
+    .file-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .file-size {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .summary-options {
+        margin-top: 24px;
+        padding: 20px;
+        background: var(--navy-secondary);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+    }
+
+    .option-group {
+        margin-bottom: 16px;
+    }
+
+    .option-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .option-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .option-input {
+        width: 100%;
+        background: var(--navy-primary);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        color: var(--text-primary);
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+
+    .option-input:hover {
+        border-color: var(--accent-blue);
+    }
+
+    .option-input:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .summarize-btn {
+        width: 100%;
+        background: linear-gradient(135deg, var(--accent-blue), #3b82f6);
+        border: none;
+        border-radius: 12px;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 24px;
+    }
+
+    .summarize-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(96, 165, 250, 0.4);
+    }
+
+    .summarize-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .result-section {
+        display: none;
+        background: var(--navy-primary);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-section.show {
+        display: block;
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .result-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .result-stats {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .summary-content {
+        background: var(--navy-secondary);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        font-size: 15px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .loading-indicator {
+        display: none;
+        text-align: center;
+        padding: 32px;
+        color: var(--text-secondary);
+    }
+
+    .loading-indicator.show {
+        display: block;
+    }
+
+    .spinner {
+        border: 3px solid var(--border);
+        border-top: 3px solid var(--accent-blue);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+        display: none;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        padding: 16px;
+        color: #ef4444;
+        margin-top: 16px;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .summarizer-container {
+            padding: 16px;
+        }
+
+        .summarizer-header h1 {
+            font-size: 24px;
+        }
+
+        .summarizer-header p {
+            font-size: 14px;
+        }
+
+        .upload-section {
+            padding: 20px;
+        }
+
+        .file-upload-area {
+            padding: 32px 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+        }
+
+        .result-section {
+            padding: 20px;
+        }
+
+        .result-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summarizer-header h1 {
+            font-size: 20px;
+        }
+
+        .upload-section {
+            padding: 16px;
+        }
+
+        .file-upload-area {
+            padding: 24px 12px;
+        }
+
+        .result-section {
+            padding: 16px;
+        }
+
+        .summary-content {
+            padding: 16px;
+            font-size: 14px;
+        }
+    }
+</style>
+
+<div class="summarizer-container">
+    <div class="summarizer-header">
+        <h1>AI Document Summarizer</h1>
+        <p>Upload your PDF, Word, or PowerPoint documents and get intelligent summaries powered by AI</p>
+    </div>
+
+    <div class="upload-section">
+        <div class="file-upload-area" id="uploadArea">
+            <div class="upload-icon"></div>
+            <div class="upload-text">Click to upload or drag and drop</div>
+            <div class="upload-hint">Supports PDF, DOCX, and PPTX files (Max 50MB)</div>
+            <input type="file" id="fileInput" accept=".pdf,.docx,.pptx" />
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <div class="summary-options">
+            <div class="option-group">
+                <label class="option-label" for="summaryLength">Summary Length</label>
+                <select class="option-input" id="summaryLength">
+                    <option value="short">Short (2-3 sentences)</option>
+                    <option value="medium" selected>Medium (1-2 paragraphs)</option>
+                    <option value="long">Long (3-5 paragraphs)</option>
+                </select>
+            </div>
+
+            <div class="option-group">
+                <label class="option-label" for="sentenceCount">Number of Sentences</label>
+                <input type="number" class="option-input" id="sentenceCount" min="3" max="50" value="5" />
+            </div>
+        </div>
+
+        <button class="summarize-btn" id="summarizeBtn" onclick="summarizeDocument()" disabled>
+            Generate Summary
+        </button>
+
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner"></div>
+        <div>Processing your document...</div>
+    </div>
+
+    <div class="result-section" id="resultSection">
+        <div class="result-header">
+            <div class="result-title">Summary</div>
+            <div class="result-stats" id="resultStats"></div>
+        </div>
+        <div class="summary-content" id="summaryContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let selectedFile = null;
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const resultSection = document.getElementById('resultSection');
+    const summaryContent = document.getElementById('summaryContent');
+    const resultStats = document.getElementById('resultStats');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // File upload click
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        handleFileSelect(e.target.files[0]);
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            handleFileSelect(file);
+        }
+    });
+
+    function handleFileSelect(file) {
+        if (!file) return;
+
+        // Validate file type
+        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
+        const validExtensions = ['.pdf', '.docx', '.pptx'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+
+        if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+            showError('Please upload a PDF, DOCX, or PPTX file.');
+            return;
+        }
+
+        // Validate file size (50MB)
+        if (file.size > 50 * 1024 * 1024) {
+            showError('File size exceeds 50MB limit.');
+            return;
+        }
+
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.add('show');
+        summarizeBtn.disabled = false;
+        hideError();
+        resultSection.classList.remove('show');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.add('show');
+    }
+
+    function hideError() {
+        errorMessage.classList.remove('show');
+    }
+
+    async function summarizeDocument() {
+        if (!selectedFile) {
+            showError('Please select a file first.');
+            return;
+        }
+
+        const summaryLength = document.getElementById('summaryLength').value;
+        const sentenceCount = parseInt(document.getElementById('sentenceCount').value) || 5;
+
+        // Validate sentence count
+        if (sentenceCount < 3 || sentenceCount > 50) {
+            showError('Sentence count must be between 3 and 50.');
+            return;
+        }
+
+        // Show loading, hide result
+        loadingIndicator.classList.add('show');
+        resultSection.classList.remove('show');
+        summarizeBtn.disabled = true;
+        hideError();
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('summary_length', summaryLength);
+        formData.append('sentence_count', sentenceCount);
+
+        try {
+            const response = await fetch('/summarize/document', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to summarize document');
+            }
+
+            // Display result
+            summaryContent.textContent = data.summary;
+            resultStats.textContent = `${data.original_sentences} sentences → ${data.summary_sentences} sentences`;
+            resultSection.classList.add('show');
+            
+        } catch (error) {
+            showError(error.message || 'An error occurred while summarizing the document.');
+        } finally {
+            loadingIndicator.classList.remove('show');
+            summarizeBtn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}
+
