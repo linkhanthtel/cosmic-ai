@@ -29,6 +29,10 @@ def chat_page():
 def converter_page():
     return render_template('converter.html')
 
+@app.route('/summarizer')
+def summarizer_page():
+    return render_template('summarizer.html')
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -525,6 +529,161 @@ def convert_file():
             if os.path.exists(upload_path):
                 os.remove(upload_path)
             return jsonify({'error': f'Conversion failed: {str(e)}'}), 500
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def extract_text_from_pdf(file_path):
+    """Extract text from PDF file"""
+    import PyPDF2
+    text = ""
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            for page in pdf_reader.pages:
+                text += page.extract_text() + "\n"
+    except Exception as e:
+        raise Exception(f"Failed to extract text from PDF: {str(e)}")
+    return text
+
+def extract_text_from_word(file_path):
+    """Extract text from Word document"""
+    from docx import Document
+    try:
+        doc = Document(file_path)
+        text = "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
+    except Exception as e:
+        raise Exception(f"Failed to extract text from Word document: {str(e)}")
+    return text
+
+def extract_text_from_pptx(file_path):
+    """Extract text from PowerPoint presentation"""
+    from pptx import Presentation
+    try:
+        prs = Presentation(file_path)
+        text_parts = []
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text") and shape.text.strip():
+                    text_parts.append(shape.text)
+        text = "\n".join(text_parts)
+    except Exception as e:
+        if file_path.lower().endswith('.ppt'):
+            raise Exception("Old PowerPoint format (.ppt) is not supported. Please convert to .pptx format first.")
+        raise Exception(f"Failed to extract text from PowerPoint: {str(e)}")
+    return text
+
+def summarize_text(text, summary_length='medium', sentence_count=5):
+    """Summarize text using extractive summarization"""
+    try:
+        from sumy.parsers.plaintext import PlaintextParser
+        from sumy.nlp.tokenizers import Tokenizer
+        from sumy.summarizers.lsa import LsaSummarizer
+        from sumy.summarizers.text_rank import TextRankSummarizer
+        from sumy.nlp.stemmers import Stemmer
+        from sumy.utils import get_stop_words
+        import nltk
+        
+        # Download required NLTK data if not already present
+        try:
+            nltk.data.find('tokenizers/punkt')
+        except LookupError:
+            nltk.download('punkt', quiet=True)
+        
+        # Determine sentence count based on summary length
+        if summary_length == 'short':
+            sentence_count = min(3, sentence_count)
+        elif summary_length == 'medium':
+            sentence_count = min(10, max(5, sentence_count))
+        else:  # long
+            sentence_count = min(20, max(10, sentence_count))
+        
+        # Parse text
+        language = "english"
+        parser = PlaintextParser.from_string(text, Tokenizer(language))
+        stemmer = Stemmer(language)
+        
+        # Use TextRank summarizer (better quality than LSA)
+        summarizer = TextRankSummarizer(stemmer)
+        summarizer.stop_words = get_stop_words(language)
+        
+        # Generate summary
+        summary_sentences = summarizer(parser.document, sentence_count)
+        summary = " ".join([str(sentence) for sentence in summary_sentences])
+        
+        return summary, len(summary_sentences)
+    
+    except ImportError:
+        # Fallback to simple sentence extraction if sumy is not available
+        sentences = text.split('.')
+        sentences = [s.strip() for s in sentences if s.strip()]
+        summary_sentences = sentences[:sentence_count]
+        summary = ". ".join(summary_sentences)
+        if summary and not summary.endswith('.'):
+            summary += "."
+        return summary, len(summary_sentences)
+    except Exception as e:
+        raise Exception(f"Summarization failed: {str(e)}")
+
+@app.route('/summarize/document', methods=['POST'])
+def summarize_document():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        summary_length = request.form.get('summary_length', 'medium')
+        sentence_count = int(request.form.get('sentence_count', 5))
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Validate file type
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        if file_ext not in ['pdf', 'docx', 'pptx']:
+            return jsonify({'error': 'Unsupported file type. Please upload PDF, DOCX, or PPTX files.'}), 400
+        
+        # Save uploaded file temporarily
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(upload_path)
+        
+        try:
+            # Extract text based on file type
+            if file_ext == 'pdf':
+                text = extract_text_from_pdf(upload_path)
+            elif file_ext == 'docx':
+                text = extract_text_from_word(upload_path)
+            elif file_ext == 'pptx':
+                text = extract_text_from_pptx(upload_path)
+            else:
+                os.remove(upload_path)
+                return jsonify({'error': 'Unsupported file type'}), 400
+            
+            if not text.strip():
+                os.remove(upload_path)
+                return jsonify({'error': 'No text could be extracted from the document'}), 400
+            
+            # Count original sentences
+            original_sentences = len([s for s in text.split('.') if s.strip()])
+            
+            # Generate summary
+            summary, summary_sentence_count = summarize_text(text, summary_length, sentence_count)
+            
+            # Clean up uploaded file
+            os.remove(upload_path)
+            
+            return jsonify({
+                'summary': summary,
+                'original_sentences': original_sentences,
+                'summary_sentences': summary_sentence_count,
+                'summary_length': summary_length
+            })
+        
+        except Exception as e:
+            if os.path.exists(upload_path):
+                os.remove(upload_path)
+            return jsonify({'error': str(e)}), 500
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
