@@ -14,8 +14,12 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx', 'pptx', 'ppt', 'doc'}
 # Initialize the chatbot
 chatbot = ChatBot()
 
-# Create uploads directory
+# Create necessary directories (works on both local and Render)
 os.makedirs('uploads', exist_ok=True)
+os.makedirs('templates', exist_ok=True)
+os.makedirs('static', exist_ok=True)
+os.makedirs('models', exist_ok=True)
+os.makedirs('data', exist_ok=True)
 
 @app.route('/')
 def index():
@@ -450,9 +454,10 @@ def convert_file():
         if not allowed_file(file.filename, from_format):
             return jsonify({'error': f'Invalid file type. {from_format.upper()} files are not supported.'}), 400
         
-        # Save uploaded file temporarily
+        # Save uploaded file temporarily (use tempfile for Render compatibility)
         filename = secure_filename(file.filename)
-        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # Use tempfile for better compatibility with Render's ephemeral filesystem
+        upload_path = os.path.join(tempfile.gettempdir(), f"upload_{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}")
         file.save(upload_path)
         
         try:
@@ -647,9 +652,10 @@ def summarize_document():
         if file_ext not in ['pdf', 'docx', 'pptx']:
             return jsonify({'error': 'Unsupported file type. Please upload PDF, DOCX, or PPTX files.'}), 400
         
-        # Save uploaded file temporarily
+        # Save uploaded file temporarily (use tempfile for Render compatibility)
         filename = secure_filename(file.filename)
-        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # Use tempfile for better compatibility with Render's ephemeral filesystem
+        upload_path = os.path.join(tempfile.gettempdir(), f"upload_{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}")
         file.save(upload_path)
         
         try:
@@ -869,11 +875,9 @@ def generate_image():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # Create necessary directories
-    os.makedirs('templates', exist_ok=True)
-    os.makedirs('static', exist_ok=True)
-    os.makedirs('models', exist_ok=True)
-    os.makedirs('data', exist_ok=True)
-    os.makedirs('uploads', exist_ok=True)
+    # Get port from environment variable (Render provides this) or default to 8080
+    port = int(os.environ.get('PORT', 8080))
+    # Disable debug mode in production (Render sets this automatically)
+    debug = os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG', 'False').lower() == 'true'
     
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=debug, host='0.0.0.0', port=port)
