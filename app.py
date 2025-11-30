@@ -33,6 +33,10 @@ def converter_page():
 def summarizer_page():
     return render_template('summarizer.html')
 
+@app.route('/image-generator')
+def image_generator_page():
+    return render_template('image_generator.html')
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -684,6 +688,182 @@ def summarize_document():
             if os.path.exists(upload_path):
                 os.remove(upload_path)
             return jsonify({'error': str(e)}), 500
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def generate_image_with_stable_diffusion(prompt, size='768x512', style='realistic', num_images=1):
+    """Generate image using Stable Diffusion (if available)"""
+    try:
+        from diffusers import StableDiffusionPipeline
+        import torch
+        from PIL import Image
+        import io
+        import base64
+        
+        # Parse size
+        width, height = map(int, size.split('x'))
+        
+        # Load model (this will download on first use)
+        pipe = StableDiffusionPipeline.from_pretrained(
+            "runwayml/stable-diffusion-v1-5",
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
+        )
+        
+        if torch.cuda.is_available():
+            pipe = pipe.to("cuda")
+        
+        # Adjust prompt based on style
+        style_prompts = {
+            'realistic': f"photorealistic, high quality, {prompt}",
+            'artistic': f"artistic, painting style, {prompt}",
+            'cartoon': f"cartoon style, animated, {prompt}",
+            'abstract': f"abstract art, modern, {prompt}"
+        }
+        enhanced_prompt = style_prompts.get(style, prompt)
+        
+        # Generate image
+        images = pipe(enhanced_prompt, width=width, height=height, num_images_per_prompt=num_images).images
+        
+        # Convert to base64
+        if num_images == 1:
+            img = images[0]
+            buffered = io.BytesIO()
+            img.save(buffered, format="PNG")
+            img_str = base64.b64encode(buffered.getvalue()).decode()
+            return f"data:image/png;base64,{img_str}"
+        else:
+            # Return multiple images (for now, return first one)
+            img = images[0]
+            buffered = io.BytesIO()
+            img.save(buffered, format="PNG")
+            img_str = base64.b64encode(buffered.getvalue()).decode()
+            return f"data:image/png;base64,{img_str}"
+    
+    except ImportError:
+        # Fallback to placeholder if diffusers not available
+        return generate_placeholder_image(prompt, size, style)
+    except Exception as e:
+        # Fallback on error
+        print(f"Stable Diffusion error: {e}")
+        return generate_placeholder_image(prompt, size, style)
+
+def generate_placeholder_image(prompt, size='768x512', style='realistic'):
+    """Generate a placeholder image using PIL (fallback)"""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        import io
+        import base64
+        import hashlib
+        
+        # Parse size
+        width, height = map(int, size.split('x'))
+        
+        # Create image with gradient background
+        img = Image.new('RGB', (width, height), color='#0f172a')
+        draw = ImageDraw.Draw(img)
+        
+        # Create gradient effect
+        for i in range(height):
+            r = int(15 + (i / height) * 20)
+            g = int(23 + (i / height) * 30)
+            b = int(42 + (i / height) * 40)
+            color = (r, g, b)
+            draw.line([(0, i), (width, i)], fill=color)
+        
+        # Add text
+        try:
+            # Try to use a nicer font
+            font_size = min(width // 20, 32)
+            font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", font_size)
+        except:
+            try:
+                font = ImageFont.load_default()
+            except:
+                font = None
+        
+        # Center text
+        text = prompt[:50] + "..." if len(prompt) > 50 else prompt
+        text_lines = []
+        words = text.split()
+        current_line = ""
+        
+        for word in words:
+            test_line = current_line + (" " if current_line else "") + word
+            if len(test_line) * 8 < width - 40:
+                current_line = test_line
+            else:
+                if current_line:
+                    text_lines.append(current_line)
+                current_line = word
+        if current_line:
+            text_lines.append(current_line)
+        
+        # Draw text
+        y_offset = (height - len(text_lines) * 30) // 2
+        for i, line in enumerate(text_lines):
+            bbox = draw.textbbox((0, 0), line, font=font) if font else (0, 0, len(line) * 8, 20)
+            text_width = bbox[2] - bbox[0]
+            x = (width - text_width) // 2
+            y = y_offset + i * 30
+            draw.text((x, y), line, fill='#60a5fa', font=font)
+        
+        # Add style indicator
+        style_text = f"Style: {style.title()}"
+        draw.text((20, 20), style_text, fill='#cbd5e1', font=font)
+        
+        # Convert to base64
+        buffered = io.BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        return f"data:image/png;base64,{img_str}"
+    
+    except Exception as e:
+        # Ultimate fallback - return error
+        raise Exception(f"Image generation failed: {str(e)}")
+
+@app.route('/generate/image', methods=['POST'])
+def generate_image():
+    try:
+        data = request.get_json()
+        prompt = data.get('prompt', '').strip()
+        size = data.get('size', '768x512')
+        style = data.get('style', 'realistic')
+        num_images = int(data.get('num_images', 1))
+        
+        if not prompt:
+            return jsonify({'error': 'Prompt is required'}), 400
+        
+        if len(prompt) < 10:
+            return jsonify({'error': 'Prompt must be at least 10 characters long'}), 400
+        
+        # Validate size
+        valid_sizes = ['512x512', '768x512', '512x768', '1024x1024']
+        if size not in valid_sizes:
+            size = '768x512'
+        
+        # Validate style
+        valid_styles = ['realistic', 'artistic', 'cartoon', 'abstract']
+        if style not in valid_styles:
+            style = 'realistic'
+        
+        # Limit num_images
+        num_images = min(max(1, num_images), 4)
+        
+        try:
+            # Try Stable Diffusion first
+            image_data = generate_image_with_stable_diffusion(prompt, size, style, num_images)
+        except Exception as e:
+            # Fallback to placeholder
+            print(f"Image generation error: {e}")
+            image_data = generate_placeholder_image(prompt, size, style)
+        
+        return jsonify({
+            'image_data': image_data,
+            'prompt': prompt,
+            'size': size,
+            'style': style
+        })
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
