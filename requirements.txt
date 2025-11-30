@@ -10,3 +10,9 @@ PyPDF2>=3.0.0
 reportlab>=4.0.0
 sumy>=0.11.0
 nltk>=3.8.1
+Pillow>=10.0.0
+# Optional: For advanced AI image generation (requires significant resources)
+# Uncomment to use Stable Diffusion locally
+# diffusers>=0.21.0
+# torch>=2.0.0
+# transformers>=4.30.0
