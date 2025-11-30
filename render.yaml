@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: cosmic-ai
+    env: python
+    buildCommand: pip3 install -r requirements.txt
+    startCommand: python app.py
+    # PORT is automatically set by Render, no need to specify
+    # PYTHON_VERSION can be specified if needed, but Render will auto-detect
+
