@@ -1,4 +1,4 @@
-# AI Chatbot Trainer
+# Cosmic AI
 
 Cosmic AI is a personal project created to showcase my skills in artificial intelligence, web development, and user experience design. It features a conversational AI assistant with memory and contextual awareness, built to demonstrate practical implementation of modern AI technologies. This is an independent, non-commercial project and not affiliated with any enterprise.
 
@@ -141,14 +141,9 @@ self.model = RandomForestClassifier(n_estimators=100)
 - Regular retraining helps maintain accuracy
 - Monitor the confidence scores in the response generation
 
-## License
-
-This project is open source and available under the MIT License.
-
 ## Contributing
 
 Feel free to submit issues, feature requests, or pull requests to improve this chatbot trainer!
 
 ---
 
-**Happy Training! 🚀**
