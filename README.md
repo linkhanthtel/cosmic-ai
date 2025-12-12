@@ -1,6 +1,4 @@
-# Cosmic AI
-
-Cosmic AI is a personal project created to showcase my skills in artificial intelligence, web development, and user experience design. It features a conversational AI assistant with memory and contextual awareness, built to demonstrate practical implementation of modern AI technologies. This is an independent, non-commercial project and not affiliated with any enterprise.
+# Cosmic AI 
 
 ## Features
 
