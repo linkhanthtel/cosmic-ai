@@ -4,19 +4,6 @@
 
 - 🤖 **Interactive Chat Interface**: Chat with your trained bot in real-time
 - 🎓 **Custom Training**: Add your own question-answer pairs to train the bot
-- 📊 **Data Management**: View, add, and delete training data through the web interface
-- 🔄 **Model Retraining**: Retrain the model with updated data
-- 💾 **Persistent Storage**: Training data and models are saved locally
-- 🎨 **Modern UI**: Beautiful, responsive web interface
-- 🚀 **Easy Setup**: Simple installation and startup process
-
-## How It Works
-
-The chatbot uses a combination of:
-- **TF-IDF Vectorization**: Converts text to numerical features
-- **Naive Bayes Classification**: Learns patterns from your training data
-- **Cosine Similarity**: Fallback matching for better responses
-- **Label Encoding**: Maps answers to numerical labels for training
 
 ## Installation
 
