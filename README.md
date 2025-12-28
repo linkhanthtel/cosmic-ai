@@ -1,10 +1,5 @@
 # Cosmic AI 
 
-## Features
-
-- 🤖 **Interactive Chat Interface**: Chat with your trained bot in real-time
-- 🎓 **Custom Training**: Add your own question-answer pairs to train the bot
-
 ## Installation
 
 1. **Clone or download this repository**
@@ -38,18 +33,6 @@
 1. After adding some training data, click "Retrain Model"
 2. The system will train the AI model with your data
 3. You'll see a success message when training is complete
-
-### 3. Chatting with Your Bot
-
-1. Go to the chat section on the left
-2. Type your message and press Enter or click "Send"
-3. Your bot will respond based on the training data you provided
-
-### 4. Managing Training Data
-
-- **View**: All your training data is displayed in the right panel
-- **Delete**: Click the "Delete" button next to any training item to remove it
-- **Update**: Delete old data and add new data to update your bot's knowledge
 
 ## File Structure
 
