@@ -1,10 +1,5 @@
 # Cosmic AI 
 
-## Features
-
-- 🤖 **Interactive Chat Interface**: Chat with your trained bot in real-time
-- 🎓 **Custom Training**: Add your own question-answer pairs to train the bot
-
 ## Installation
 
 1. **Clone or download this repository**
@@ -39,18 +34,6 @@
 2. The system will train the AI model with your data
 3. You'll see a success message when training is complete
 
-### 3. Chatting with Your Bot
-
-1. Go to the chat section on the left
-2. Type your message and press Enter or click "Send"
-3. Your bot will respond based on the training data you provided
-
-### 4. Managing Training Data
-
-- **View**: All your training data is displayed in the right panel
-- **Delete**: Click the "Delete" button next to any training item to remove it
-- **Update**: Delete old data and add new data to update your bot's knowledge
-
 ## File Structure
 
 ```
@@ -69,66 +52,4 @@ cosmic-ai/
 └── README.md
 ```
 
-## API Endpoints
-
-- `POST /chat` - Send a message to the chatbot
-- `POST /add_data` - Add new training data
-- `GET /get_training_data` - Retrieve all training data
-- `POST /delete_data` - Delete specific training data
-- `POST /retrain` - Retrain the model with current data
-
-## Tips for Better Training
-
-1. **Quality over Quantity**: Focus on high-quality, diverse question-answer pairs
-2. **Consistent Formatting**: Use consistent question formats (e.g., always start with "What is...", "How do I...")
-3. **Cover Different Topics**: Include various topics and question types
-4. **Regular Updates**: Retrain your model after adding new data
-5. **Test Regularly**: Chat with your bot to identify gaps in knowledge
-
-## Customization
-
-### Adding More Training Data Programmatically
-
-You can add training data programmatically by modifying the `data/training_data.json` file:
-
-```json
-[
-  {
-    "question": "What is machine learning?",
-    "answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and improve from experience without being explicitly programmed.",
-    "timestamp": "2024-01-01T12:00:00"
-  }
-]
-```
-
-### Modifying the Model
-
-To use a different machine learning model, modify the `train_model` method in `chatbot.py`:
-
-```python
-# Replace MultinomialNB with your preferred model
-from sklearn.ensemble import RandomForestClassifier
-self.model = RandomForestClassifier(n_estimators=100)
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"I haven't been trained yet"**: Add some training data and click "Retrain Model"
-2. **Poor responses**: Add more diverse training data and retrain
-3. **Import errors**: Make sure all dependencies are installed with `pip install -r requirements.txt`
-4. **Port already in use**: Change the port in `app.py` (line 95) from 5000 to another port
-
-### Performance Tips
-
-- For better performance with large datasets, consider using more powerful models
-- Regular retraining helps maintain accuracy
-- Monitor the confidence scores in the response generation
-
-## Contributing
-
-Feel free to submit issues, feature requests, or pull requests to improve this chatbot trainer!
-
----
 
