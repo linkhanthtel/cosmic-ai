@@ -225,6 +225,143 @@ def allowed_file(filename, extension=None):
         return extension.lower() in app.config['ALLOWED_EXTENSIONS']
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+def convert_ppt_to_pptx(input_path, output_path):
+    """Convert old PowerPoint .ppt to .pptx using LibreOffice or alternative method"""
+    import subprocess
+    import shutil
+    
+    # Method 1: Try LibreOffice command line (works on Linux/Mac/Windows if installed)
+    try:
+        # Try different LibreOffice command names
+        libreoffice_cmd = None
+        for cmd in ['libreoffice', 'soffice', '/Applications/LibreOffice.app/Contents/MacOS/soffice']:
+            if shutil.which(cmd):
+                libreoffice_cmd = cmd
+                break
+        
+        if libreoffice_cmd:
+            # Use LibreOffice to convert
+            cmd = [
+                libreoffice_cmd,
+                '--headless',
+                '--convert-to', 'pptx',
+                '--outdir', os.path.dirname(output_path),
+                input_path
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0:
+                # LibreOffice creates file with same name but .pptx extension
+                converted_file = os.path.join(
+                    os.path.dirname(output_path),
+                    os.path.splitext(os.path.basename(input_path))[0] + '.pptx'
+                )
+                if os.path.exists(converted_file):
+                    if converted_file != output_path:
+                        shutil.move(converted_file, output_path)
+                    return True
+    except Exception as e:
+        print(f"LibreOffice conversion failed: {e}")
+    
+    # Method 2: Try pypandoc if available
+    try:
+        import pypandoc
+        pypandoc.convert_file(input_path, 'pptx', outputfile=output_path)
+        if os.path.exists(output_path):
+            return True
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"Pypandoc conversion failed: {e}")
+    
+    # Method 3: Try comtypes on Windows (for .ppt files)
+    try:
+        import platform
+        if platform.system() == 'Windows':
+            import comtypes.client
+            powerpoint = comtypes.client.CreateObject("PowerPoint.Application")
+            powerpoint.Visible = 1
+            presentation = powerpoint.Presentations.Open(input_path)
+            presentation.SaveAs(output_path, 24)  # 24 = ppSaveAsOpenXMLPresentation
+            presentation.Close()
+            powerpoint.Quit()
+            if os.path.exists(output_path):
+                return True
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"Comtypes conversion failed: {e}")
+    
+    # If all methods fail, raise an error
+    raise Exception("Could not convert .ppt to .pptx. Please install LibreOffice or convert the file manually to .pptx format first.")
+
+def convert_doc_to_docx(input_path, output_path):
+    """Convert old Word .doc to .docx using LibreOffice or alternative method"""
+    import subprocess
+    import shutil
+    
+    # Method 1: Try LibreOffice command line
+    try:
+        libreoffice_cmd = None
+        for cmd in ['libreoffice', 'soffice', '/Applications/LibreOffice.app/Contents/MacOS/soffice']:
+            if shutil.which(cmd):
+                libreoffice_cmd = cmd
+                break
+        
+        if libreoffice_cmd:
+            cmd = [
+                libreoffice_cmd,
+                '--headless',
+                '--convert-to', 'docx',
+                '--outdir', os.path.dirname(output_path),
+                input_path
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0:
+                converted_file = os.path.join(
+                    os.path.dirname(output_path),
+                    os.path.splitext(os.path.basename(input_path))[0] + '.docx'
+                )
+                if os.path.exists(converted_file):
+                    if converted_file != output_path:
+                        shutil.move(converted_file, output_path)
+                    return True
+    except Exception as e:
+        print(f"LibreOffice conversion failed: {e}")
+    
+    # Method 2: Try pypandoc if available
+    try:
+        import pypandoc
+        pypandoc.convert_file(input_path, 'docx', outputfile=output_path)
+        if os.path.exists(output_path):
+            return True
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"Pypandoc conversion failed: {e}")
+    
+    # Method 3: Try comtypes on Windows
+    try:
+        import platform
+        if platform.system() == 'Windows':
+            import comtypes.client
+            word = comtypes.client.CreateObject("Word.Application")
+            word.Visible = 0
+            doc = word.Documents.Open(input_path)
+            doc.SaveAs(output_path, 16)  # 16 = wdFormatDocumentDefault (docx)
+            doc.Close()
+            word.Quit()
+            if os.path.exists(output_path):
+                return True
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"Comtypes conversion failed: {e}")
+    
+    # If all methods fail, raise an error
+    raise Exception("Could not convert .doc to .docx. Please install LibreOffice or convert the file manually to .docx format first.")
+
 def convert_pdf_to_word(input_path, output_path):
     """Convert PDF to Word document"""
     from pdf2docx import Converter
@@ -262,6 +399,13 @@ def convert_word_to_pdf(input_path, output_path):
             story.append(Spacer(1, 0.2*inch))
     
     pdf_doc.build(story)
+    
+    # Clean up converted file if it was created
+    if converted_file and os.path.exists(converted_file):
+        try:
+            os.remove(converted_file)
+        except:
+            pass
 
 def convert_pptx_to_pdf(input_path, output_path):
     """Convert PowerPoint to PDF"""
@@ -270,12 +414,21 @@ def convert_pptx_to_pdf(input_path, output_path):
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet
     
+    # Handle old .ppt files
+    actual_input_path = input_path
+    converted_file = None
+    if input_path.lower().endswith('.ppt'):
+        try:
+            converted_file = os.path.join(tempfile.gettempdir(), f"temp_pptx_{datetime.now().strftime('%Y%m%d%H%M%S')}.pptx")
+            convert_ppt_to_pptx(input_path, converted_file)
+            if os.path.exists(converted_file):
+                actual_input_path = converted_file
+        except Exception as e:
+            raise Exception(f"Failed to convert .ppt to .pptx: {str(e)}")
+    
     try:
-        prs = Presentation(input_path)
+        prs = Presentation(actual_input_path)
     except Exception as e:
-        # Check if it's an old .ppt file
-        if input_path.lower().endswith('.ppt'):
-            raise Exception("Old PowerPoint format (.ppt) is not supported. Please convert to .pptx format first.")
         raise Exception(f"Failed to open PowerPoint file: {str(e)}")
     
     c = canvas.Canvas(output_path, pagesize=letter)
@@ -320,6 +473,13 @@ def convert_pptx_to_pdf(input_path, output_path):
             c.showPage()
     
     c.save()
+    
+    # Clean up converted file if it was created
+    if converted_file and os.path.exists(converted_file):
+        try:
+            os.remove(converted_file)
+        except:
+            pass
 
 def convert_pdf_to_pptx(input_path, output_path):
     """Convert PDF to PowerPoint (extract text and create slides)"""
@@ -362,7 +522,19 @@ def convert_word_to_pptx(input_path, output_path):
     from docx import Document
     from pptx import Presentation
     
-    doc = Document(input_path)
+    # Handle old .doc files
+    actual_input_path = input_path
+    converted_file = None
+    if input_path.lower().endswith('.doc'):
+        try:
+            converted_file = os.path.join(tempfile.gettempdir(), f"temp_docx_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx")
+            convert_doc_to_docx(input_path, converted_file)
+            if os.path.exists(converted_file):
+                actual_input_path = converted_file
+        except Exception as e:
+            raise Exception(f"Failed to convert .doc to .docx: {str(e)}")
+    
+    doc = Document(actual_input_path)
     prs = Presentation()
     prs.slide_width = 9144000
     prs.slide_height = 6858000
@@ -382,18 +554,34 @@ def convert_word_to_pptx(input_path, output_path):
             p.text = para.text[:200]
     
     prs.save(output_path)
+    
+    # Clean up converted file if it was created
+    if converted_file and os.path.exists(converted_file):
+        try:
+            os.remove(converted_file)
+        except:
+            pass
 
 def convert_pptx_to_word(input_path, output_path):
     """Convert PowerPoint to Word (extract text and create document)"""
     from pptx import Presentation
     from docx import Document
     
+    # Handle old .ppt files
+    actual_input_path = input_path
+    converted_file = None
+    if input_path.lower().endswith('.ppt'):
+        try:
+            converted_file = os.path.join(tempfile.gettempdir(), f"temp_pptx_{datetime.now().strftime('%Y%m%d%H%M%S')}.pptx")
+            convert_ppt_to_pptx(input_path, converted_file)
+            if os.path.exists(converted_file):
+                actual_input_path = converted_file
+        except Exception as e:
+            raise Exception(f"Failed to convert .ppt to .pptx: {str(e)}")
+    
     try:
-        prs = Presentation(input_path)
+        prs = Presentation(actual_input_path)
     except Exception as e:
-        # Check if it's an old .ppt file
-        if input_path.lower().endswith('.ppt'):
-            raise Exception("Old PowerPoint format (.ppt) is not supported. Please convert to .pptx format first.")
         raise Exception(f"Failed to open PowerPoint file: {str(e)}")
     
     doc = Document()
@@ -408,6 +596,13 @@ def convert_pptx_to_word(input_path, output_path):
                 doc.add_paragraph(shape.text)
     
     doc.save(output_path)
+    
+    # Clean up converted file if it was created
+    if converted_file and os.path.exists(converted_file):
+        try:
+            os.remove(converted_file)
+        except:
+            pass
 
 @app.route('/convert/file', methods=['POST'])
 def convert_file():
@@ -498,29 +693,39 @@ def convert_file():
             
             try:
                 if conversion_key == 'pdf_to_docx':
-                    convert_pdf_to_word(upload_path, output_path)
+                    convert_pdf_to_word(actual_input_path, output_path)
                 elif conversion_key == 'docx_to_pdf':
-                    convert_word_to_pdf(upload_path, output_path)
+                    convert_word_to_pdf(actual_input_path, output_path)
                 elif conversion_key == 'pptx_to_pdf':
-                    convert_pptx_to_pdf(upload_path, output_path)
+                    convert_pptx_to_pdf(actual_input_path, output_path)
                 elif conversion_key == 'pdf_to_pptx':
-                    convert_pdf_to_pptx(upload_path, output_path)
+                    convert_pdf_to_pptx(actual_input_path, output_path)
                 elif conversion_key == 'docx_to_pptx':
-                    convert_word_to_pptx(upload_path, output_path)
+                    convert_word_to_pptx(actual_input_path, output_path)
                 elif conversion_key == 'pptx_to_docx':
-                    convert_pptx_to_word(upload_path, output_path)
+                    convert_pptx_to_word(actual_input_path, output_path)
                 else:
+                    # Clean up files
                     os.remove(upload_path)
+                    if converted_file_path and os.path.exists(converted_file_path):
+                        os.remove(converted_file_path)
                     return jsonify({'error': f'Conversion from {from_format} to {to_format} is not supported'}), 400
             except Exception as conv_error:
-                os.remove(upload_path)
+                # Clean up files
+                if os.path.exists(upload_path):
+                    os.remove(upload_path)
+                if converted_file_path and os.path.exists(converted_file_path):
+                    os.remove(converted_file_path)
                 error_msg = str(conv_error)
                 if 'not supported' in error_msg.lower() or 'old format' in error_msg.lower():
                     return jsonify({'error': error_msg}), 400
                 return jsonify({'error': f'Conversion failed: {error_msg}'}), 500
             
-            # Clean up uploaded file
-            os.remove(upload_path)
+            # Clean up uploaded and converted files
+            if os.path.exists(upload_path):
+                os.remove(upload_path)
+            if converted_file_path and os.path.exists(converted_file_path):
+                os.remove(converted_file_path)
             
             # Send the converted file
             return send_file(
@@ -531,12 +736,18 @@ def convert_file():
             )
         
         except ImportError as e:
+            # Clean up files
             if os.path.exists(upload_path):
                 os.remove(upload_path)
+            if converted_file_path and os.path.exists(converted_file_path):
+                os.remove(converted_file_path)
             return jsonify({'error': f'Required library not installed: {str(e)}'}), 500
         except Exception as e:
+            # Clean up files
             if os.path.exists(upload_path):
                 os.remove(upload_path)
+            if converted_file_path and os.path.exists(converted_file_path):
+                os.remove(converted_file_path)
             return jsonify({'error': f'Conversion failed: {str(e)}'}), 500
     
     except Exception as e:
@@ -568,6 +779,20 @@ def extract_text_from_word(file_path):
 def extract_text_from_pptx(file_path):
     """Extract text from PowerPoint presentation"""
     from pptx import Presentation
+    
+    # Check if it's an old .ppt file
+    if file_path.lower().endswith('.ppt'):
+        # Try to convert .ppt to .pptx first
+        try:
+            converted_path = os.path.join(tempfile.gettempdir(), f"temp_pptx_{datetime.now().strftime('%Y%m%d%H%M%S')}.pptx")
+            convert_ppt_to_pptx(file_path, converted_path)
+            if os.path.exists(converted_path):
+                file_path = converted_path
+            else:
+                raise Exception("Failed to convert .ppt to .pptx")
+        except Exception as e:
+            raise Exception(f"Old PowerPoint format (.ppt) detected but conversion failed: {str(e)}. Please convert to .pptx format first.")
+    
     try:
         prs = Presentation(file_path)
         text_parts = []
@@ -577,8 +802,6 @@ def extract_text_from_pptx(file_path):
                     text_parts.append(shape.text)
         text = "\n".join(text_parts)
     except Exception as e:
-        if file_path.lower().endswith('.ppt'):
-            raise Exception("Old PowerPoint format (.ppt) is not supported. Please convert to .pptx format first.")
         raise Exception(f"Failed to extract text from PowerPoint: {str(e)}")
     return text
 
