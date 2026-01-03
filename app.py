@@ -14,6 +14,74 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx', 'pptx', 'ppt', 'doc'}
 # Initialize the chatbot
 chatbot = ChatBot()
 
+# Initialize NLTK data for document summarization
+def initialize_nltk_data():
+    """Download required NLTK data if not already present"""
+    try:
+        import nltk
+        import ssl
+        import certifi
+        
+        # Handle SSL certificate issues (common on macOS)
+        try:
+            _create_unverified_https_context = ssl._create_unverified_context
+        except AttributeError:
+            pass
+        else:
+            ssl._create_default_https_context = _create_unverified_https_context
+        
+        # Download punkt_tab (newer NLTK versions) - force download to ensure it works
+        try:
+            nltk.data.find('tokenizers/punkt_tab')
+            print("NLTK punkt_tab tokenizer already available")
+        except LookupError:
+            try:
+                print("Downloading NLTK punkt_tab tokenizer...")
+                nltk.download('punkt_tab', quiet=True)
+                # Verify it was downloaded
+                try:
+                    nltk.data.find('tokenizers/punkt_tab')
+                    print("Successfully downloaded and verified punkt_tab")
+                except LookupError:
+                    print("Warning: punkt_tab download may have failed - SSL issue may require manual download")
+            except Exception as e:
+                error_msg = str(e)
+                if 'SSL' in error_msg or 'certificate' in error_msg:
+                    print("SSL certificate issue detected. NLTK data will be downloaded on first use.")
+                    print("To fix permanently, run: /Applications/Python\\ 3.13/Install\\ Certificates.command")
+                else:
+                    print(f"Could not download punkt_tab: {e}")
+        
+        # Also download punkt (for compatibility with older sumy versions)
+        try:
+            nltk.data.find('tokenizers/punkt')
+            print("NLTK punkt tokenizer already available")
+        except LookupError:
+            try:
+                print("Downloading NLTK punkt tokenizer...")
+                nltk.download('punkt', quiet=True)
+                # Verify it was downloaded
+                try:
+                    nltk.data.find('tokenizers/punkt')
+                    print("Successfully downloaded and verified punkt")
+                except LookupError:
+                    print("Warning: punkt download may have failed - SSL issue may require manual download")
+            except Exception as e:
+                error_msg = str(e)
+                if 'SSL' in error_msg or 'certificate' in error_msg:
+                    print("SSL certificate issue detected. NLTK data will be downloaded on first use.")
+                else:
+                    print(f"Could not download punkt: {e}")
+    except ImportError:
+        # NLTK not installed, will be handled when needed
+        print("NLTK not available - will download when needed")
+        pass
+    except Exception as e:
+        print(f"Error initializing NLTK data: {e}")
+
+# Initialize NLTK data at startup
+initialize_nltk_data()
+
 # Create necessary directories (works on both local and Render)
 os.makedirs('uploads', exist_ok=True)
 os.makedirs('templates', exist_ok=True)
@@ -606,6 +674,10 @@ def convert_pptx_to_word(input_path, output_path):
 
 @app.route('/convert/file', methods=['POST'])
 def convert_file():
+    # Initialize variables at the start to ensure they're always defined
+    converted_file_path = None
+    upload_path = None
+    
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -655,7 +727,46 @@ def convert_file():
         upload_path = os.path.join(tempfile.gettempdir(), f"upload_{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}")
         file.save(upload_path)
         
+        # Track if we need to clean up a converted file
+        actual_input_path = upload_path
+        actual_from_format = from_format
+        
         try:
+            # Handle old file formats by converting them first
+            # Convert .ppt to .pptx if needed
+            if file_ext == 'ppt':
+                try:
+                    converted_file_path = os.path.join(tempfile.gettempdir(), f"converted_{datetime.now().strftime('%Y%m%d%H%M%S')}.pptx")
+                    convert_ppt_to_pptx(upload_path, converted_file_path)
+                    if os.path.exists(converted_file_path):
+                        actual_input_path = converted_file_path
+                        actual_from_format = 'pptx'
+                        file_ext = 'pptx'
+                    else:
+                        raise Exception("Conversion from .ppt to .pptx failed")
+                except Exception as conv_error:
+                    os.remove(upload_path)
+                    return jsonify({
+                        'error': f'Failed to convert .ppt file: {str(conv_error)}. Please ensure LibreOffice is installed or convert the file to .pptx format manually.'
+                    }), 400
+            
+            # Convert .doc to .docx if needed
+            elif file_ext == 'doc':
+                try:
+                    converted_file_path = os.path.join(tempfile.gettempdir(), f"converted_{datetime.now().strftime('%Y%m%d%H%M%S')}.docx")
+                    convert_doc_to_docx(upload_path, converted_file_path)
+                    if os.path.exists(converted_file_path):
+                        actual_input_path = converted_file_path
+                        actual_from_format = 'docx'
+                        file_ext = 'docx'
+                    else:
+                        raise Exception("Conversion from .doc to .docx failed")
+                except Exception as conv_error:
+                    os.remove(upload_path)
+                    return jsonify({
+                        'error': f'Failed to convert .doc file: {str(conv_error)}. Please ensure LibreOffice is installed or convert the file to .docx format manually.'
+                    }), 400
+            
             # Determine output filename and path
             output_filename = filename.rsplit('.', 1)[0] + '.' + to_format
             output_path = os.path.join(tempfile.gettempdir(), output_filename)
@@ -672,21 +783,8 @@ def convert_file():
                 'ppt': 'pptx',
                 'doc': 'docx'
             }
-            normalized_from = format_mapping.get(from_format, from_format)
+            normalized_from = format_mapping.get(actual_from_format, actual_from_format)
             normalized_to = format_mapping.get(to_format, to_format)
-            
-            # Check if old format is being used - python-pptx only supports .pptx, not .ppt
-            if file_ext == 'ppt':
-                os.remove(upload_path)
-                return jsonify({
-                    'error': 'Old PowerPoint format (.ppt) is not supported. The python-pptx library only works with .pptx files. Please convert your .ppt file to .pptx format first using Microsoft PowerPoint or an online converter.'
-                }), 400
-            
-            if file_ext == 'doc':
-                os.remove(upload_path)
-                return jsonify({
-                    'error': 'Old Word format (.doc) is not supported. Please convert your .doc file to .docx format first using Microsoft Word or an online converter.'
-                }), 400
             
             # Perform conversion based on format combination (use normalized formats)
             conversion_key = f"{normalized_from}_to_{normalized_to}"
@@ -817,10 +915,65 @@ def summarize_text(text, summary_length='medium', sentence_count=5):
         import nltk
         
         # Download required NLTK data if not already present
+        # Handle SSL certificate issues
+        import ssl
+        try:
+            _create_unverified_https_context = ssl._create_unverified_context
+        except AttributeError:
+            pass
+        else:
+            ssl._create_default_https_context = _create_unverified_https_context
+        
+        punkt_tab_available = False
+        punkt_available = False
+        
+        # Try to find punkt_tab
+        try:
+            nltk.data.find('tokenizers/punkt_tab')
+            punkt_tab_available = True
+        except LookupError:
+            try:
+                print("Downloading punkt_tab tokenizer...")
+                nltk.download('punkt_tab', quiet=True)
+                # Verify download
+                try:
+                    nltk.data.find('tokenizers/punkt_tab')
+                    punkt_tab_available = True
+                    print("punkt_tab downloaded successfully")
+                except LookupError:
+                    print("punkt_tab download failed verification")
+            except Exception as e:
+                error_msg = str(e)
+                if 'SSL' in error_msg or 'certificate' in error_msg:
+                    print("SSL certificate issue - trying alternative method...")
+                else:
+                    print(f"Failed to download punkt_tab: {e}")
+        
+        # Try to find punkt (for compatibility)
         try:
             nltk.data.find('tokenizers/punkt')
+            punkt_available = True
         except LookupError:
-            nltk.download('punkt', quiet=True)
+            try:
+                print("Downloading punkt tokenizer...")
+                nltk.download('punkt', quiet=True)
+                # Verify download
+                try:
+                    nltk.data.find('tokenizers/punkt')
+                    punkt_available = True
+                    print("punkt downloaded successfully")
+                except LookupError:
+                    print("punkt download failed verification")
+            except Exception as e:
+                error_msg = str(e)
+                if 'SSL' in error_msg or 'certificate' in error_msg:
+                    print("SSL certificate issue - trying alternative method...")
+                else:
+                    print(f"Failed to download punkt: {e}")
+        
+        # If neither is available, raise an error with helpful message
+        if not punkt_tab_available and not punkt_available:
+            raise LookupError("Neither punkt_tab nor punkt tokenizers are available. Please install them manually by running: python3 -c \"import nltk; import ssl; ssl._create_default_https_context = ssl._create_unverified_context; nltk.download('punkt_tab'); nltk.download('punkt')\" or fix SSL certificates by running: /Applications/Python\\ 3.13/Install\\ Certificates.command")
         
         # Determine sentence count based on summary length
         if summary_length == 'short':
@@ -854,6 +1007,46 @@ def summarize_text(text, summary_length='medium', sentence_count=5):
         if summary and not summary.endswith('.'):
             summary += "."
         return summary, len(summary_sentences)
+    except LookupError as e:
+        # NLTK data missing - try to download it
+        import nltk
+        import ssl
+        error_msg = str(e)
+        
+        # Handle SSL certificate issues
+        try:
+            _create_unverified_https_context = ssl._create_unverified_context
+        except AttributeError:
+            pass
+        else:
+            ssl._create_default_https_context = _create_unverified_https_context
+        
+        if 'punkt' in error_msg.lower() or 'tokenizer' in error_msg.lower():
+            try:
+                # Try downloading punkt_tab first
+                try:
+                    nltk.download('punkt_tab', quiet=True)
+                    # Verify
+                    nltk.data.find('tokenizers/punkt_tab')
+                except Exception:
+                    # Try punkt as fallback
+                    try:
+                        nltk.download('punkt', quiet=True)
+                        # Verify
+                        nltk.data.find('tokenizers/punkt')
+                    except Exception:
+                        pass
+                
+                # Retry summarization
+                return summarize_text(text, summary_length, sentence_count)
+            except Exception as download_error:
+                error_str = str(download_error)
+                if 'SSL' in error_str or 'certificate' in error_str:
+                    raise Exception(f"NLTK tokenizers are missing due to SSL certificate issue. Please run: python3 -c \"import nltk; import ssl; ssl._create_default_https_context = ssl._create_unverified_context; nltk.download('punkt_tab'); nltk.download('punkt')\" or fix SSL certificates by running: /Applications/Python\\ 3.13/Install\\ Certificates.command. Original error: {error_msg}")
+                else:
+                    raise Exception(f"NLTK tokenizers are missing. Please install them by running: python3 -c \"import nltk; import ssl; ssl._create_default_https_context = ssl._create_unverified_context; nltk.download('punkt_tab'); nltk.download('punkt')\". Original error: {error_msg}. Download error: {error_str}")
+        else:
+            raise Exception(f"NLTK resource missing: {error_msg}")
     except Exception as e:
         raise Exception(f"Summarization failed: {str(e)}")
 
