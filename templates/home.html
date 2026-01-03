@@ -2,113 +2,383 @@
 
 {% block title %}Home - Cosmic AI{% endblock %}
 
+{% block extra_css %}
+<style>
+    .home-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 60px 32px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .home-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        animation: slideIn 0.8s ease-out;
+    }
+
+    .hero-section {
+        text-align: center;
+        margin-bottom: 80px;
+        position: relative;
+    }
+
+    .hero-title {
+        font-size: 64px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: var(--accent-cyan);
+        text-shadow: 
+            0 0 30px rgba(0, 212, 255, 1),
+            0 0 60px rgba(0, 212, 255, 0.7),
+            0 0 90px rgba(0, 212, 255, 0.5),
+            0 0 120px rgba(168, 85, 247, 0.3),
+            0 2px 4px rgba(0, 0, 0, 0.5);
+        filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8));
+        letter-spacing: -1px;
+        line-height: 1.1;
+        position: relative;
+    }
+
+    .hero-subtitle {
+        font-size: 22px;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.8;
+        animation: slideIn 1s ease-out 0.2s both;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+        margin-bottom: 80px;
+    }
+
+    .feature-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 32px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        animation: slideIn 0.8s ease-out both;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .feature-card:hover::before {
+        left: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: var(--accent-blue);
+        box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.2), inset 0 0 60px rgba(0, 212, 255, 0.05);
+    }
+
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        position: relative;
+        transition: all 0.4s ease;
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .feature-card:nth-child(2) .feature-icon {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1));
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .feature-card:nth-child(3) .feature-icon {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.1));
+        border: 1px solid rgba(236, 72, 153, 0.3);
+    }
+
+    .feature-card:nth-child(4) .feature-icon {
+        background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 245, 255, 0.1));
+        border: 1px solid rgba(0, 245, 255, 0.3);
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+        animation: float 2s ease-in-out infinite;
+    }
+
+    .feature-card:nth-child(1) .feature-icon svg { color: var(--accent-cyan); }
+    .feature-card:nth-child(2) .feature-icon svg { color: var(--accent-purple); }
+    .feature-card:nth-child(3) .feature-icon svg { color: var(--accent-pink); }
+    .feature-card:nth-child(4) .feature-icon svg { color: var(--accent-cyan); }
+
+    .feature-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .feature-description {
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .feature-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent-cyan);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .feature-link::after {
+        content: '→';
+        transition: transform 0.3s ease;
+    }
+
+    .feature-link:hover {
+        color: var(--accent-blue);
+        gap: 12px;
+    }
+
+    .feature-link:hover::after {
+        transform: translateX(4px);
+    }
+
+    .about-section {
+        background: var(--glass-bg);
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 32px;
+        padding: 48px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 0 80px rgba(0, 212, 255, 0.05);
+        animation: slideIn 1s ease-out 0.5s both;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .about-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+        animation: float 15s ease-in-out infinite;
+    }
+
+    .about-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 1;
+    }
+
+    .about-description {
+        font-size: 17px;
+        color: var(--text-secondary);
+        line-height: 1.9;
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .about-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 32px;
+        margin-top: 40px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .about-feature {
+        padding: 24px;
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .about-feature:hover {
+        background: rgba(0, 212, 255, 0.1);
+        border-color: rgba(0, 212, 255, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+    }
+
+    .about-feature-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--accent-cyan);
+    }
+
+    .about-feature-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .home-container {
+            padding: 40px 20px;
+        }
+
+        .hero-title {
+            font-size: 42px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+        }
+
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .about-section {
+            padding: 32px 24px;
+        }
+
+        .about-features {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="flex: 1; overflow-y: auto; padding: 40px 32px;">
-    <div style="max-width: 900px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 48px;">
-            <h1 style="font-size: 48px; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, var(--accent-blue), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Welcome to Cosmic AI
-            </h1>
-            <p style="font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
-                Your intelligent AI platform with multiple powerful features
-            </p>
+<div class="home-container">
+    <div class="home-content">
+        <div class="hero-section">
+            <h1 class="hero-title">Welcome to Cosmic AI</h1>
+            <p class="hero-subtitle">Your intelligent AI platform with multiple powerful features. Experience the future of artificial intelligence.</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px;">
-            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
-                <div style="width: 48px; height: 48px; background: rgba(96, 165, 250, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="feature-grid">
+            <a href="/chat" class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                 </div>
-                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">AI Chat</h3>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-                    Intelligent conversational AI with memory, context awareness, and personality traits.
-                </p>
-                <a href="/chat" style="display: inline-block; color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 500;">
-                    Try it now →
-                </a>
-            </div>
+                <h3 class="feature-title">AI Chat</h3>
+                <p class="feature-description">Intelligent conversational AI with memory, context awareness, and personality traits.</p>
+                <span class="feature-link">Try it now</span>
+            </a>
 
-            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
-                <div style="width: 48px; height: 48px; background: rgba(167, 139, 250, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <a href="/converter" class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                         <line x1="16" y1="13" x2="8" y2="13"></line>
                         <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
                 </div>
-                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">File Converter</h3>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-                    Convert PDF files to Word documents (.docx) with ease. Simple drag-and-drop interface.
-                </p>
-                <a href="/converter" style="display: inline-block; color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 500;">
-                    Try it now →
-                </a>
-            </div>
+                <h3 class="feature-title">File Converter</h3>
+                <p class="feature-description">Convert between PDF, Word, and PowerPoint formats with ease. Simple drag-and-drop interface.</p>
+                <span class="feature-link">Try it now</span>
+            </a>
 
-            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
-                <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <a href="/summarizer" class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                         <line x1="16" y1="13" x2="8" y2="13"></line>
                         <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
                 </div>
-                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Document Summarizer</h3>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-                    Upload PDF, Word, or PowerPoint documents and get intelligent AI-powered summaries with customizable length.
-                </p>
-                <a href="/summarizer" style="display: inline-block; color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 500;">
-                    Try it now →
-                </a>
-            </div>
+                <h3 class="feature-title">Document Summarizer</h3>
+                <p class="feature-description">Upload PDF, Word, or PowerPoint documents and get intelligent AI-powered summaries with customizable length.</p>
+                <span class="feature-link">Try it now</span>
+            </a>
 
-            <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s ease;">
-                <div style="width: 48px; height: 48px; background: rgba(236, 72, 153, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <a href="/image-generator" class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                 </div>
-                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Image Generator</h3>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-                    Create stunning images from text descriptions using AI. Choose from different styles and sizes.
-                </p>
-                <a href="/image-generator" style="display: inline-block; color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 500;">
-                    Try it now →
-                </a>
-            </div>
+                <h3 class="feature-title">Image Generator</h3>
+                <p class="feature-description">Create stunning images from text descriptions using AI. Choose from different styles and sizes.</p>
+                <span class="feature-link">Try it now</span>
+            </a>
         </div>
 
-        <div style="background: var(--navy-primary); border: 1px solid var(--border); border-radius: 16px; padding: 32px;">
-            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">About Cosmic AI</h2>
-            <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+        <div class="about-section">
+            <h2 class="about-title">About Cosmic AI</h2>
+            <p class="about-description">
                 Cosmic AI is a comprehensive AI platform designed to provide intelligent, context-aware interactions. 
                 Our AI Chat feature uses advanced machine learning techniques to understand and respond to your queries 
-                with personality, memory, and emotional intelligence.
+                with personality, memory, and emotional intelligence. Experience the next generation of artificial intelligence.
             </p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 24px;">
-                <div>
-                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Context Aware</h4>
-                    <p style="font-size: 13px; color: var(--text-muted);">Remembers conversation history and maintains context</p>
+            <div class="about-features">
+                <div class="about-feature">
+                    <h4 class="about-feature-title">Context Aware</h4>
+                    <p class="about-feature-desc">Remembers conversation history and maintains context throughout interactions</p>
                 </div>
-                <div>
-                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Personality</h4>
-                    <p style="font-size: 13px; color: var(--text-muted);">Customizable personality traits for natural interactions</p>
+                <div class="about-feature">
+                    <h4 class="about-feature-title">Personality</h4>
+                    <p class="about-feature-desc">Customizable personality traits for natural and engaging interactions</p>
                 </div>
-                <div>
-                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-blue);">Intelligent</h4>
-                    <p style="font-size: 13px; color: var(--text-muted);">Advanced keyword matching and similarity algorithms</p>
+                <div class="about-feature">
+                    <h4 class="about-feature-title">Intelligent</h4>
+                    <p class="about-feature-desc">Advanced keyword matching and similarity algorithms for accurate responses</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
