@@ -9,8 +9,8 @@
         display: flex;
         flex-direction: column;
         padding: 24px;
-        overflow-y: auto;
         min-height: 100vh;
+        width: 100%;
     }
 
     .generator-header {
@@ -19,14 +19,18 @@
     }
 
     .generator-header h1 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--text-primary);
-        background: linear-gradient(135deg, var(--accent-blue), #a78bfa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-size: 42px;
+        font-weight: 900;
+        margin-bottom: 16px;
+        color: #00f5ff;
+        text-shadow: 
+            0 0 10px rgba(0, 245, 255, 1),
+            0 0 20px rgba(0, 245, 255, 0.9),
+            0 0 30px rgba(0, 245, 255, 0.7),
+            0 0 40px rgba(0, 245, 255, 0.5),
+            0 2px 4px rgba(0, 0, 0, 0.8);
+        filter: drop-shadow(0 0 12px rgba(0, 245, 255, 1));
+        letter-spacing: 1.5px;
     }
 
     .generator-header p {
@@ -38,14 +42,27 @@
     }
 
     .prompt-section {
-        background: var(--navy-primary);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 32px;
-        max-width: 800px;
+        background: rgba(26, 26, 46, 0.98);
+        border: 2px solid rgba(0, 245, 255, 0.3);
+        border-radius: 32px;
+        padding: 40px;
+        max-width: 900px;
         width: 100%;
-        margin: 0 auto 24px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin: 0 auto 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 80px rgba(0, 245, 255, 0.1);
+        animation: slideIn 0.8s ease-out;
+        position: relative;
+    }
+
+    .prompt-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 245, 255, 0.1) 0%, transparent 70%);
+        animation: float 15s ease-in-out infinite;
     }
 
     .prompt-input-group {
@@ -62,26 +79,30 @@
 
     .prompt-textarea {
         width: 100%;
-        background: var(--navy-secondary);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 16px;
+        background: rgba(26, 26, 46, 0.8);
+        border: 2px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 18px;
         color: var(--text-primary);
         font-size: 15px;
         font-family: inherit;
         resize: vertical;
-        min-height: 120px;
-        transition: all 0.2s ease;
+        min-height: 140px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
     }
 
     .prompt-textarea:hover {
-        border-color: var(--accent-blue);
+        border-color: var(--accent-cyan);
+        background: rgba(0, 245, 255, 0.05);
     }
 
     .prompt-textarea:focus {
         outline: none;
-        border-color: var(--accent-blue);
-        box-shadow: 0 0 0 3px var(--accent-glow);
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(0, 245, 255, 0.3);
+        transform: translateY(-2px);
     }
 
     .prompt-textarea::placeholder {
@@ -134,25 +155,47 @@
 
     .generate-btn {
         width: 100%;
-        background: linear-gradient(135deg, var(--accent-blue), #3b82f6);
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
         border: none;
-        border-radius: 12px;
-        padding: 16px 24px;
-        font-size: 16px;
-        font-weight: 600;
+        border-radius: 16px;
+        padding: 18px 32px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        font-size: 17px;
+        font-weight: 700;
         color: white;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4), 0 0 40px rgba(0, 212, 255, 0.2);
+        letter-spacing: 0.5px;
+    }
+
+    .generate-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .generate-btn:hover:not(:disabled)::before {
+        left: 100%;
     }
 
     .generate-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(96, 165, 250, 0.4);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.4);
+        animation: glow 2s ease-in-out infinite;
     }
 
     .generate-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        box-shadow: none;
     }
 
     .result-section {
