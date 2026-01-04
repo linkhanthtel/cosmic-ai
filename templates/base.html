@@ -337,6 +337,156 @@
             min-height: 100vh;
         }
 
+        /* Footer */
+        .footer {
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border-top: 2px solid transparent;
+            padding: 60px 24px 32px;
+            margin-top: auto;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent 0%,
+                var(--accent-blue) 20%,
+                var(--accent-purple) 40%,
+                var(--accent-pink) 60%,
+                var(--accent-purple) 80%,
+                var(--accent-blue) 100%,
+                transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 4s linear infinite;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(168, 85, 247, 0.4);
+        }
+
+        .footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-brand h2 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple), var(--accent-pink));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+            text-shadow: 0 0 40px rgba(0, 245, 255, 0.5);
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.6));
+            position: relative;
+        }
+
+        .footer-brand h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-purple), var(--accent-blue), transparent);
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+        }
+
+        .footer-tagline {
+            font-size: 16px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            font-weight: 500;
+            max-width: 600px;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .footer-tagline::before,
+        .footer-tagline::after {
+            content: '◆';
+            color: var(--accent-blue);
+            opacity: 0.6;
+            margin: 0 16px;
+            animation: pulse 3s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 32px;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .footer-copyright strong {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .footer-divider {
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            margin: 8px 0;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+        }
+
         /* Mobile Menu Toggle */
         .mobile-menu-toggle {
             display: none;
@@ -398,6 +548,49 @@
 
             .main-content {
                 width: 100%;
+            }
+
+            .footer {
+                padding: 40px 20px 24px;
+            }
+
+            .footer-brand h2 {
+                font-size: 24px;
+                letter-spacing: 3px;
+            }
+
+            .footer-tagline {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+            .footer-tagline::before,
+            .footer-tagline::after {
+                margin: 0 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer {
+                padding: 32px 16px 20px;
+            }
+
+            .footer-brand h2 {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+
+            .footer-tagline {
+                font-size: 13px;
+                letter-spacing: 0.5px;
+            }
+
+            .footer-copyright {
+                font-size: 12px;
+            }
+
+            .footer-divider {
+                width: 150px;
             }
         }
 
@@ -485,6 +678,23 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>COSMIC AI</h2>
+                <p class="footer-tagline">Empowering your workflow with cutting-edge AI technology</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-divider"></div>
+            <div class="footer-copyright">
+                © <strong>2026 Cosmic AI</strong>. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script>
         function toggleSidebar() {
