@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - Cosmic AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 48px 32px 64px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-content {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: slideIn 0.8s ease-out;
+    }
+
+    .faq-header {
+        margin-bottom: 32px;
+    }
+
+    .faq-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 212, 255, 0.5);
+        color: var(--accent-cyan);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .faq-title {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
+    }
+
+    .faq-subtitle {
+        font-size: 15px;
+        color: var(--text-secondary);
+        max-width: 620px;
+        line-height: 1.8;
+    }
+
+    .faq-list {
+        margin-top: 24px;
+    }
+
+    .faq-item {
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.18);
+    }
+
+    .faq-question {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+    }
+
+    .faq-answer {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.8;
+    }
+
+    .faq-answer a {
+        color: var(--accent-cyan);
+        text-decoration: none;
+    }
+
+    .faq-answer a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .page-container {
+            padding: 32px 20px 48px;
+        }
+
+        .faq-title {
+            font-size: 26px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-content">
+        <header class="faq-header">
+            <div class="faq-badge">Questions</div>
+            <h1 class="faq-title">Frequently Asked Questions</h1>
+            <p class="faq-subtitle">
+                A quick overview of how this demo works and what you can expect from premium, enterprise-grade deployments of Cosmic AI.
+            </p>
+        </header>
+
+        <section class="faq-list">
+            <article class="faq-item">
+                <h2 class="faq-question">Is this the full version of Cosmic AI?</h2>
+                <p class="faq-answer">
+                    No. This site runs a demo configuration with limited models, reduced context window, and conservative token limits
+                    so you can safely explore the features. The core experience is representative, but performance and capacity are
+                    intentionally constrained.
+                </p>
+            </article>
+
+            <article class="faq-item">
+                <h2 class="faq-question">Can I use this demo for production workloads?</h2>
+                <p class="faq-answer">
+                    This environment is intended for evaluation only. For production use cases and sensitive data, we recommend a
+                    dedicated premium or enterprise deployment with stronger guarantees around capacity, reliability, and data handling.
+                </p>
+            </article>
+
+            <article class="faq-item">
+                <h2 class="faq-question">How do premium models and tokens work?</h2>
+                <p class="faq-answer">
+                    In premium plans, you can access more capable models and larger context windows, with token quotas sized to your
+                    team’s workload. We align limits and pricing with your expected usage so you only pay for the capacity you need.
+                </p>
+            </article>
+
+            <article class="faq-item">
+                <h2 class="faq-question">How can I get access to the best quality output?</h2>
+                <p class="faq-answer">
+                    For the highest quality outputs and custom deployments, please reach out to us directly.
+                    Visit the <a href="/pricing#contact-premium">Pricing</a> page or email
+                    <a href="mailto:linkhanthtel@icloud.com">linkhanthtel@icloud.com</a> to discuss premium access.
+                </p>
+            </article>
+
+            <article class="faq-item">
+                <h2 class="faq-question">What happens to the files I upload?</h2>
+                <p class="faq-answer">
+                    Files are used only to perform the requested operation (conversion or summarization) and are then removed
+                    from temporary storage. We do not permanently store or reuse your content from this demo to train public models.
+                </p>
+            </article>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
