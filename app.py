@@ -93,6 +93,26 @@ os.makedirs('data', exist_ok=True)
 def index():
     return render_template('home.html')
 
+@app.route('/pricing')
+def pricing_page():
+    return render_template('pricing.html')
+
+@app.route('/security')
+def security_page():
+    return render_template('security.html')
+
+@app.route('/faq')
+def faq_page():
+    return render_template('faq.html')
+
+@app.route('/privacy')
+def privacy_page():
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms_page():
+    return render_template('terms.html')
+
 @app.route('/chat')
 def chat_page():
     return render_template('chat.html')
