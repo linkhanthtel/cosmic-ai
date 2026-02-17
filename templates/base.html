@@ -531,6 +531,7 @@
 
             .main-content {
                 width: 100%;
+                padding-top: 60px;
             }
 
             .footer {
@@ -580,6 +581,79 @@
         @media (min-width: 769px) {
             .mobile-overlay {
                 display: none !important;
+            }
+        }
+
+        .demo-banner {
+            background: rgba(10, 10, 15, 0.96);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.25);
+            padding: 12px 24px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 5;
+        }
+
+        .demo-banner-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .demo-label {
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .demo-message {
+            color: var(--text-secondary);
+        }
+
+        .demo-banner-cta {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 212, 255, 0.6);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.18), rgba(168, 85, 247, 0.24));
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 18px rgba(0, 212, 255, 0.35);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .demo-banner-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(0, 212, 255, 0.55);
+            border-color: var(--accent-blue-hover);
+        }
+
+        @media (max-width: 768px) {
+            .demo-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .demo-banner-cta {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
             }
         }
 
@@ -652,12 +726,31 @@
                     </svg>
                     <span>Image Generator</span>
                 </a>
+                <a href="/pricing" class="nav-item {% if request.endpoint == 'pricing_page' %}active{% endif %}">
+                    <span>Pricing & Plans</span>
+                </a>
+                <a href="/security" class="nav-item {% if request.endpoint == 'security_page' %}active{% endif %}">
+                    <span>Security</span>
+                </a>
+                <a href="/faq" class="nav-item {% if request.endpoint == 'faq_page' %}active{% endif %}">
+                    <span>FAQ</span>
+                </a>
                 {% block nav_items %}{% endblock %}
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
+            <div class="demo-banner">
+                <div class="demo-banner-text">
+                    <span class="demo-label">Demo Version</span>
+                    <span class="demo-message">
+                        This site runs a limited demo of Cosmic AI with reduced model quality, speed, and token quotas.
+                        For premium models, higher limits, and enterprise deployment, please contact us.
+                    </span>
+                </div>
+                <a href="/pricing#contact-premium" class="demo-banner-cta">Contact for Premium Access</a>
+            </div>
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -673,6 +766,11 @@
 
         <div class="footer-bottom">
             <div class="footer-divider"></div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--text-muted);">
+                <a href="/privacy" style="color:var(--text-secondary);text-decoration:none;">Privacy</a>
+                <span>•</span>
+                <a href="/terms" style="color:var(--text-secondary);text-decoration:none;">Terms</a>
+            </div>
             <div class="footer-copyright">
                 © <strong>2026 Cosmic AI</strong>. All rights reserved.
             </div>
