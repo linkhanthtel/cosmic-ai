@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Security - Cosmic AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 48px 32px 64px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        animation: slideIn 0.8s ease-out;
+    }
+
+    .security-header {
+        margin-bottom: 40px;
+    }
+
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 212, 255, 0.5);
+        color: var(--accent-cyan);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .security-title {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.03em;
+    }
+
+    .security-subtitle {
+        font-size: 15px;
+        color: var(--text-secondary);
+        max-width: 640px;
+        line-height: 1.8;
+    }
+
+    .security-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .security-card {
+        background: var(--glass-bg);
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        padding: 22px 20px;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .security-card h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+    }
+
+    .security-card p,
+    .security-card ul {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+
+    .security-card ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 6px 0 0;
+    }
+
+    .security-card ul li {
+        margin-bottom: 4px;
+    }
+
+    .section-heading {
+        margin-top: 32px;
+        margin-bottom: 8px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .section-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        margin-bottom: 8px;
+    }
+
+    .section-text small {
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+        .page-container {
+            padding: 32px 20px 48px;
+        }
+
+        .security-title {
+            font-size: 28px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-content">
+        <header class="security-header">
+            <div class="security-badge">Security & Trust</div>
+            <h1 class="security-title">How Cosmic AI handles your data</h1>
+            <p class="security-subtitle">
+                Even though this is a demo environment, Cosmic AI is built with enterprise practices in mind.
+                Below is a high-level view of how we think about security, privacy, and reliability.
+            </p>
+        </header>
+
+        <section class="security-grid">
+            <article class="security-card">
+                <h3>Data in transit</h3>
+                <p>
+                    All traffic to this demo application is served over HTTPS, ensuring your data is encrypted
+                    in transit between your browser and our servers.
+                </p>
+            </article>
+
+            <article class="security-card">
+                <h3>Data handling</h3>
+                <p>
+                    Uploaded documents are processed temporarily for conversion or summarization and then removed.
+                    We do not use your documents to train public models from this demo.
+                </p>
+            </article>
+
+            <article class="security-card">
+                <h3>Access control</h3>
+                <p>
+                    This demo is single-tenant and evaluation-focused. Enterprise deployments can include
+                    dedicated environments, SSO (SAML/OIDC), and role-based access control.
+                </p>
+            </article>
+        </section>
+
+        <h2 class="section-heading">Compliance roadmap</h2>
+        <p class="section-text">
+            For enterprise customers, we design deployments to align with common compliance frameworks such as
+            GDPR, SOC 2, and ISO 27001. This includes clear data processing agreements, data residency options,
+            and documented operational procedures.
+        </p>
+        <p class="section-text">
+            <small>
+                Note: This public demo is not intended for production-sensitive data. For regulated workloads,
+                please contact us about a dedicated environment with stricter controls.
+            </small>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
