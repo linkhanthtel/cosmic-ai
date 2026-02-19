@@ -12,6 +12,7 @@ sumy>=0.11.0
 nltk>=3.8.1
 Pillow>=10.0.0
 accelerate>=1.0.0
+pytest>=8.0.0
 # Optional: For converting old file formats (.ppt, .doc)
 # Uncomment if you want to use pypandoc for format conversion
 # pypandoc>=1.11
