@@ -258,56 +258,27 @@
         }
 
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            display: block;
             padding: 12px 16px;
             margin-bottom: 4px;
-            border-radius: 12px;
+            border-radius: 10px;
             color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.2s ease, color 0.2s ease;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .nav-item:hover::before {
-            left: 100%;
         }
 
         .nav-item:hover {
-            background: rgba(0, 212, 255, 0.1);
+            background: rgba(0, 212, 255, 0.08);
             color: var(--accent-cyan);
-            transform: translateX(4px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
         }
 
         .nav-item.active {
-            background: linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+            background: rgba(0, 212, 255, 0.12);
             color: var(--accent-cyan);
-            border-left: 3px solid var(--accent-blue);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .nav-item svg {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
+            border-left: 2px solid var(--accent-blue);
         }
 
         /* Main Content Area */
@@ -647,56 +618,14 @@
                 <h1>COSMIC AI</h1>
             </div>
             <div class="nav-menu">
-                <a href="/" class="nav-item {% if request.endpoint == 'index' or request.endpoint == 'home' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                    <span>Home</span>
-                </a>
-                <a href="/chat" class="nav-item {% if request.endpoint == 'chat_page' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>AI Chat</span>
-                </a>
-                <a href="/converter" class="nav-item {% if request.endpoint == 'converter_page' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    <span>File Converter</span>
-                </a>
-                <a href="/summarizer" class="nav-item {% if request.endpoint == 'summarizer_page' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    <span>Document Summarizer</span>
-                </a>
-                <a href="/image-generator" class="nav-item {% if request.endpoint == 'image_generator_page' %}active{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
-                    <span>Image Generator</span>
-                </a>
-                <a href="/pricing" class="nav-item {% if request.endpoint == 'pricing_page' %}active{% endif %}">
-                    <span>Pricing & Plans</span>
-                </a>
-                <a href="/security" class="nav-item {% if request.endpoint == 'security_page' %}active{% endif %}">
-                    <span>Security</span>
-                </a>
-                <a href="/faq" class="nav-item {% if request.endpoint == 'faq_page' %}active{% endif %}">
-                    <span>FAQ</span>
-                </a>
+                <a href="/" class="nav-item {% if request.endpoint == 'index' or request.endpoint == 'home' %}active{% endif %}">Home</a>
+                <a href="/chat" class="nav-item {% if request.endpoint == 'chat_page' %}active{% endif %}">AI Chat</a>
+                <a href="/converter" class="nav-item {% if request.endpoint == 'converter_page' %}active{% endif %}">File Converter</a>
+                <a href="/summarizer" class="nav-item {% if request.endpoint == 'summarizer_page' %}active{% endif %}">Document Summarizer</a>
+                <a href="/image-generator" class="nav-item {% if request.endpoint == 'image_generator_page' %}active{% endif %}">Image Generator</a>
+                <a href="/pricing" class="nav-item {% if request.endpoint == 'pricing_page' %}active{% endif %}">Pricing & Plans</a>
+                <a href="/security" class="nav-item {% if request.endpoint == 'security_page' %}active{% endif %}">Security</a>
+                <a href="/faq" class="nav-item {% if request.endpoint == 'faq_page' %}active{% endif %}">FAQ</a>
                 {% block nav_items %}{% endblock %}
             </div>
         </nav>
