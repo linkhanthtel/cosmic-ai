@@ -3,26 +3,7 @@ scikit-learn>=1.3.0
 numpy>=1.24.0
 joblib>=1.3.0
 requests>=2.31.0
-pdf2docx>=0.5.6
-python-docx>=0.8.11
-python-pptx>=0.6.21
-PyPDF2>=3.0.0
-reportlab>=4.0.0
-sumy>=0.11.0
-nltk>=3.8.1
-Pillow>=10.0.0
 gunicorn>=21.0.0
 
-# Development / testing only (install manually if needed)
+# Development / testing (install locally: pip install pytest)
 # pytest>=8.0.0
-# accelerate>=1.0.0
-# Optional: For converting old file formats (.ppt, .doc)
-# Uncomment if you want to use pypandoc for format conversion
-# pypandoc>=1.11
-# Note: LibreOffice command line is preferred for .ppt/.doc conversion
-# Install LibreOffice on your system for best compatibility
-# Optional: For advanced AI image generation (requires significant resources)
-# Uncomment to use Stable Diffusion locally
-# diffusers>=0.21.0
-# torch>=2.0.0
-# transformers>=4.30.0
