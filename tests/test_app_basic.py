@@ -1,5 +1,4 @@
 import json
-import os
 
 import pytest
 from app import app
@@ -12,28 +11,14 @@ def client():
         yield client
 
 
-def test_home_page_renders(client):
+def test_root_redirects_to_chat(client):
     resp = client.get("/")
-    assert resp.status_code == 200
-    assert b"Cosmic AI" in resp.data
+    assert resp.status_code == 302
+    assert "/chat" in resp.headers.get("Location", "")
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "/chat",
-        "/converter",
-        "/summarizer",
-        "/image-generator",
-        "/pricing",
-        "/security",
-        "/faq",
-        "/privacy",
-        "/terms",
-    ],
-)
-def test_feature_pages_render(client, path):
-    resp = client.get(path)
+def test_chat_page_renders(client):
+    resp = client.get("/chat")
     assert resp.status_code == 200
 
 
@@ -48,4 +33,3 @@ def test_chat_endpoint_basic(client):
     data = resp.get_json()
     assert "response" in data
     assert isinstance(data["response"], str)
-
