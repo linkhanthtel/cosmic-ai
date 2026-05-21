@@ -634,17 +634,7 @@
                 <h1>COSMIC AI</h1>
             </div>
             <div class="nav-menu">
-                <a href="/" class="nav-item {% if request.endpoint == 'index' or request.endpoint == 'home' %}active{% endif %}">Home</a>
                 <a href="/chat" class="nav-item {% if request.endpoint == 'chat_page' %}active{% endif %}">AI Chat</a>
-                <a href="/converter" class="nav-item {% if request.endpoint == 'converter_page' %}active{% endif %}">File Converter</a>
-                <a href="/summarizer" class="nav-item {% if request.endpoint == 'summarizer_page' %}active{% endif %}">Document Summarizer</a>
-                <a href="/image-generator" class="nav-item {% if request.endpoint == 'image_generator_page' %}active{% endif %}">Image Generator</a>
-
-                <div class="nav-section-title">About Us</div>
-                <a href="/pricing" class="nav-item nav-sub {% if request.endpoint == 'pricing_page' %}active{% endif %}">Pricing & Plans</a>
-                <a href="/security" class="nav-item nav-sub {% if request.endpoint == 'security_page' %}active{% endif %}">Security</a>
-                <a href="/faq" class="nav-item nav-sub {% if request.endpoint == 'faq_page' %}active{% endif %}">FAQ</a>
-
                 {% block nav_items %}{% endblock %}
             </div>
         </nav>
@@ -655,11 +645,9 @@
                 <div class="demo-banner-text">
                     <span class="demo-label">Demo Version</span>
                     <span class="demo-message">
-                        This site runs a limited demo of Cosmic AI with reduced model quality, speed, and token quotas.
-                        For premium models, higher limits, and enterprise deployment, please contact us.
+                        This is a demo of Cosmic AI Chat. Responses use the built-in training data and keyword matching.
                     </span>
                 </div>
-                <a href="/pricing#contact-premium" class="demo-banner-cta">Contact for Premium Access</a>
             </div>
             {% block content %}{% endblock %}
         </main>
@@ -674,11 +662,6 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <nav class="footer-links">
-                <a href="/privacy">Privacy</a>
-                <span class="footer-sep">|</span>
-                <a href="/terms">Terms</a>
-            </nav>
             <div class="footer-copyright">
                 © <strong>2026 Cosmic AI</strong>. All rights reserved.
             </div>
