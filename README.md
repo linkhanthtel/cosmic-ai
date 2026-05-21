@@ -1,55 +1,51 @@
-# Cosmic AI 
+# Cosmic AI Chat
+
+Keyword-based AI chatbot with training data management, built with Flask and scikit-learn.
 
 ## Installation
 
-1. **Clone or download this repository**
-   ```bash
-   cd cosmic-ai
-   ```
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the application**
-   ```bash
-   python app.py
-   ```
-
-4. **Open your browser**
-   Navigate to `http://localhost:8080`
+Open `http://localhost:8080` (redirects to `/chat`).
 
 ## Usage
 
-### 1. Adding Training Data
+- Open **AI Chat** and send messages.
+- Training data lives in `data/training_data.json`.
+- Use `train_model.py` to train or update the model locally.
 
-1. In the "Training Data Management" section, enter a question and its corresponding answer
-2. Click "Add Data" to add it to your training dataset
-3. Repeat this process to build up your knowledge base
+## Tests
 
-### 2. Training the Model
+```bash
+pip install pytest
+pytest
+```
 
-1. After adding some training data, click "Retrain Model"
-2. The system will train the AI model with your data
-3. You'll see a success message when training is complete
+## Deploy (Fly.io)
 
-## File Structure
+```bash
+fly deploy
+```
+
+Uses `Dockerfile` and `fly.toml`. The image only includes chat dependencies (Flask, scikit-learn, numpy, joblib).
+
+## Project structure
 
 ```
 cosmic-ai/
-├── app.py                 # Main Flask application
-├── chatbot.py            # Chatbot logic and training
-├── requirements.txt      # Python dependencies
+├── app.py              # Flask app (chat routes only)
+├── chatbot.py          # Chatbot logic
+├── train_model.py      # Offline model training
+├── requirements.txt
+├── data/training_data.json
+├── models/             # Saved model files (optional)
 ├── templates/
-│   └── index.html        # Web interface
-├── data/
-│   └── training_data.json # Your training data (auto-created)
-├── models/               # Trained models (auto-created)
-│   ├── chatbot_model.pkl
-│   ├── vectorizer.pkl
-│   └── label_encoder.pkl
-└── README.md
+│   ├── base.html
+│   └── chat.html
+├── tests/
+├── Dockerfile
+└── fly.toml
 ```
-
-
