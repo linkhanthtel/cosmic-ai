@@ -610,7 +610,7 @@
     </style>
     {% block head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <div class="bg-3d-container">
         <div class="bg-3d-mesh"></div>
         <div class="bg-3d-particles"></div>
