@@ -5,23 +5,14 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# Virtual environments
 venv/
+.venv/
 env/
 ENV/
 
@@ -35,11 +26,21 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs and caches
 *.log
+.pytest_cache/
 
-# Model files (optional - uncomment if you want to exclude)
-# models/*.pkl
+# Environment secrets
+.env
 
-# Training data (optional - uncomment if you want to exclude)
-# data/training_data.json
+# Legacy sklearn models (replaced by LangChain FAISS)
+models/*.pkl
+models/chatbot_model.pkl
+models/vectorizer.pkl
+models/label_encoder.pkl
+
+# FAISS index is rebuilt locally / on deploy (optional: commit for faster cold start)
+models/faiss_index/
+
+# Local env template is committed; real secrets go in .env
+!.env.example
