@@ -1,20 +1,20 @@
 import json
 
 import pytest
+from fastapi.testclient import TestClient
+
 from app import app
 
 
 @pytest.fixture
 def client():
-    app.config["TESTING"] = True
-    with app.test_client() as client:
-        yield client
+    return TestClient(app)
 
 
 def test_root_redirects_to_chat(client):
-    resp = client.get("/")
+    resp = client.get("/", follow_redirects=False)
     assert resp.status_code == 302
-    assert "/chat" in resp.headers.get("Location", "")
+    assert "/chat" in resp.headers.get("location", "")
 
 
 def test_chat_page_renders(client):
@@ -24,12 +24,8 @@ def test_chat_page_renders(client):
 
 def test_chat_endpoint_basic(client):
     payload = {"message": "Where is Myanmar?"}
-    resp = client.post(
-        "/chat",
-        data=json.dumps(payload),
-        content_type="application/json",
-    )
+    resp = client.post("/chat", json=payload)
     assert resp.status_code == 200
-    data = resp.get_json()
+    data = resp.json()
     assert "response" in data
     assert isinstance(data["response"], str)
