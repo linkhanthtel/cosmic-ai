@@ -95,11 +95,10 @@ def show_current_status():
         if len(training_data) > 5:
             print(f"  ... and {len(training_data) - 5} more")
     
-    # Check if model exists
-    model_exists = os.path.exists('models/chatbot_model.pkl')
-    print(f"Model trained: {'✅ Yes' if model_exists else '❌ No'}")
-    
-    return len(training_data), model_exists
+    faiss_ready = os.path.exists("models/faiss_index/index.faiss")
+    print(f"FAISS index ready: {'Yes' if faiss_ready else 'No (run: python train_model.py train)'}")
+
+    return len(training_data), faiss_ready
 
 def interactive_training():
     """Interactive mode for adding training data"""

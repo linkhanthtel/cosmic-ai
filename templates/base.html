@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cosmic AI{% endblock %}</title>
+    <script>
+        (function () {
+            var stored = localStorage.getItem('cosmic-theme');
+            var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <style>
         * {
             margin: 0;
@@ -11,166 +18,61 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --navy-darkest: #0a0a0f;
-            --navy-dark: #0f0f1a;
-            --navy-primary: #1a1a2e;
-            --navy-secondary: #16213e;
-            --navy-accent: #0f3460;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-blue: #00d4ff;
-            --accent-cyan: #00f5ff;
-            --accent-purple: #a855f7;
-            --accent-pink: #ec4899;
-            --accent-blue-hover: #00b8e6;
-            --accent-glow: rgba(0, 212, 255, 0.3);
-            --accent-glow-strong: rgba(0, 212, 255, 0.5);
-            --border: rgba(0, 212, 255, 0.2);
-            --shadow: rgba(0, 0, 0, 0.8);
-            --glass-bg: rgba(26, 26, 46, 0.6);
-            --glass-border: rgba(0, 212, 255, 0.1);
+        /* Dark theme (default) */
+        :root,
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #0f1117;
+            --bg-elevated: #181b24;
+            --bg-sidebar: #14171f;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted: #6b7280;
+            --accent: #22d3ee;
+            --accent-hover: #06b6d4;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-strong: rgba(255, 255, 255, 0.16);
+            --surface-hover: rgba(34, 211, 238, 0.08);
+            --surface-active: rgba(34, 211, 238, 0.14);
+            --overlay: rgba(0, 0, 0, 0.5);
+            --shadow: rgba(0, 0, 0, 0.35);
+            /* Legacy aliases used in blocks */
+            --accent-cyan: var(--accent);
+            --glass-bg: var(--bg-elevated);
+            --glass-border: var(--border);
+            --navy-accent: #2a3142;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow), 0 0 60px var(--accent-glow); }
-            50% { box-shadow: 0 0 30px var(--accent-glow-strong), 0 0 60px var(--accent-glow-strong), 0 0 90px var(--accent-glow-strong); }
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        @keyframes particle-float {
-            0% { transform: translate3d(0, 100vh, 0); opacity: 0; }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% { transform: translate3d(50px, -100vh, 0); opacity: 0; }
-        }
-
-        @keyframes mesh-rotate {
-            0% { transform: translate3d(0, 0, 0) rotateZ(0deg); }
-            100% { transform: translate3d(0, 0, 0) rotateZ(360deg); }
-        }
-
-        @keyframes gradient-shift {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.6; }
+        /* Light theme */
+        [data-theme="light"] {
+            color-scheme: light;
+            --bg: #f4f4f5;
+            --bg-elevated: #ffffff;
+            --bg-sidebar: #ffffff;
+            --text-primary: #18181b;
+            --text-secondary: #52525b;
+            --text-muted: #a1a1aa;
+            --accent: #0891b2;
+            --accent-hover: #0e7490;
+            --border: rgba(0, 0, 0, 0.1);
+            --border-strong: rgba(0, 0, 0, 0.14);
+            --surface-hover: rgba(8, 145, 178, 0.08);
+            --surface-active: rgba(8, 145, 178, 0.12);
+            --overlay: rgba(0, 0, 0, 0.35);
+            --shadow: rgba(0, 0, 0, 0.08);
+            --accent-cyan: var(--accent);
+            --glass-bg: var(--bg-elevated);
+            --glass-border: var(--border);
+            --navy-accent: #d4d4d8;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: var(--navy-darkest);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.08) 0%, transparent 60%);
-            animation: gradient-shift 12s ease-in-out infinite;
-            z-index: 0;
-            pointer-events: none;
-            will-change: opacity;
-        }
-
-        .bg-3d-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        .bg-3d-mesh {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background-image: 
-                linear-gradient(0deg, transparent 24%, rgba(0, 212, 255, 0.06) 25%, rgba(0, 212, 255, 0.06) 26%, transparent 27%, transparent 74%, rgba(168, 85, 247, 0.06) 75%, rgba(168, 85, 247, 0.06) 76%, transparent 77%, transparent),
-                linear-gradient(90deg, transparent 24%, rgba(0, 212, 255, 0.06) 25%, rgba(0, 212, 255, 0.06) 26%, transparent 27%, transparent 74%, rgba(236, 72, 153, 0.06) 75%, rgba(236, 72, 153, 0.06) 76%, transparent 77%, transparent);
-            background-size: 100px 100px;
-            animation: mesh-rotate 60s linear infinite;
-            transform: translateZ(0);
-            will-change: transform;
-            backface-visibility: hidden;
-        }
-
-        .bg-3d-particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            transform: translateZ(0);
-        }
-
-        .bg-3d-particles::before,
-        .bg-3d-particles::after {
-            content: '';
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            box-shadow: 
-                0 0 15px var(--accent-cyan),
-                300px 400px 0 2px rgba(0, 212, 255, 0.4),
-                600px 200px 0 1px rgba(0, 212, 255, 0.25),
-                900px 600px 0 2px rgba(168, 85, 247, 0.4),
-                1200px 300px 0 1px rgba(168, 85, 247, 0.25),
-                1500px 500px 0 2px rgba(236, 72, 153, 0.4);
-            animation: particle-float 25s linear infinite;
-            transform: translateZ(0);
-            will-change: transform, opacity;
-            backface-visibility: hidden;
-        }
-
-        .bg-3d-particles::after {
-            animation-delay: -12.5s;
-            background: var(--accent-purple);
-            box-shadow: 
-                0 0 15px var(--accent-purple),
-                400px 300px 0 2px rgba(168, 85, 247, 0.4),
-                700px 500px 0 1px rgba(168, 85, 247, 0.25),
-                1000px 200px 0 2px rgba(0, 212, 255, 0.4),
-                1300px 400px 0 1px rgba(0, 212, 255, 0.25),
-                1600px 600px 0 2px rgba(236, 72, 153, 0.4);
+            transition: background 0.2s ease, color 0.2s ease;
         }
 
         .app-container {
@@ -180,279 +82,177 @@
             z-index: 1;
         }
 
-        /* Side Navigation */
         .sidebar {
-            width: 260px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border-right: 1px solid var(--glass-border);
+            width: 240px;
+            flex-shrink: 0;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             z-index: 100;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 60px rgba(0, 212, 255, 0.05);
-            position: relative;
-        }
-
-        .sidebar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple), var(--accent-pink));
-            opacity: 0.6;
-            animation: pulse 3s ease-in-out infinite;
+            transition: transform 0.25s ease, background 0.2s ease;
         }
 
         .sidebar-header {
-            padding: 24px 20px;
+            padding: 20px 16px;
             border-bottom: 1px solid var(--border);
         }
 
         .sidebar-header h1 {
-            font-size: 20px;
+            font-size: 14px;
             font-weight: 700;
+            letter-spacing: 0.15em;
             color: var(--text-primary);
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple), var(--accent-pink));
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shimmer 3s linear infinite;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
-            position: relative;
-        }
-
-        .sidebar-header h1::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-            animation: pulse 2s ease-in-out infinite;
+            text-transform: uppercase;
         }
 
         .nav-menu {
             flex: 1;
-            padding: 16px 12px;
+            padding: 12px 10px;
             overflow-y: auto;
-        }
-
-        .nav-menu::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .nav-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .nav-menu::-webkit-scrollbar-thumb {
-            background: var(--navy-accent);
-            border-radius: 2px;
         }
 
         .nav-item {
             display: block;
-            padding: 12px 16px;
-            margin-bottom: 4px;
-            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 2px;
+            border-radius: 6px;
             color: var(--text-secondary);
             text-decoration: none;
-            transition: background 0.2s ease, color 0.2s ease;
-            cursor: pointer;
             font-size: 14px;
             font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
         }
 
         .nav-item:hover {
-            background: rgba(0, 212, 255, 0.08);
-            color: var(--accent-cyan);
+            background: var(--surface-hover);
+            color: var(--accent);
         }
 
         .nav-item.active {
-            background: rgba(0, 212, 255, 0.12);
-            color: var(--accent-cyan);
-            border-left: 2px solid var(--accent-blue);
+            background: var(--surface-active);
+            color: var(--accent);
         }
 
-        .nav-section-title {
-            margin-top: 16px;
-            margin-bottom: 4px;
-            padding: 8px 16px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--text-muted);
+        .sidebar-footer {
+            padding: 12px 10px 16px;
+            border-top: 1px solid var(--border);
         }
 
-        .nav-item.nav-sub {
-            padding-left: 28px;
+        .theme-toggle {
+            width: 100%;
+            padding: 10px 14px;
             font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
-        /* Main Content Area */
+        .theme-toggle:hover {
+            border-color: var(--border-strong);
+            color: var(--text-primary);
+        }
+
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            position: relative;
-            animation: slideIn 0.6s ease-out;
             min-height: 100vh;
+            min-width: 0;
         }
 
-        /* Footer */
+        .demo-banner {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .demo-banner-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .demo-label {
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-strong);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
         .footer {
-            background: rgba(10, 10, 18, 0.98);
-            border-top: 1px solid rgba(0, 212, 255, 0.15);
-            padding: 48px 24px 28px;
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border);
+            padding: 32px 20px 20px;
             margin-top: auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        .footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), var(--accent-cyan), transparent);
-            opacity: 0.5;
         }
 
         .footer-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
-            gap: 20px;
-            position: relative;
-        }
-
-        .footer-brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
         }
 
         .footer-brand h2 {
-            font-size: 22px;
+            font-size: 14px;
             font-weight: 700;
-            letter-spacing: 6px;
+            letter-spacing: 0.12em;
             color: var(--text-primary);
             text-transform: uppercase;
         }
 
-        .footer-brand h2 span {
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
         .footer-tagline {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
-            letter-spacing: 1.5px;
-            font-weight: 400;
-            text-transform: uppercase;
+            margin-top: 6px;
         }
 
         .footer-bottom {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding-top: 24px;
-            margin-top: 8px;
-            border-top: 1px solid rgba(0, 212, 255, 0.12);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-        }
-
-        .footer-links {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: color 0.2s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-cyan);
-        }
-
-        .footer-links .footer-sep {
-            color: rgba(0, 212, 255, 0.3);
-            user-select: none;
+            text-align: center;
+            padding-top: 16px;
+            margin-top: 16px;
+            border-top: 1px solid var(--border);
         }
 
         .footer-copyright {
             font-size: 12px;
             color: var(--text-muted);
-            letter-spacing: 1px;
-            font-weight: 400;
         }
 
-        .footer-copyright strong {
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        /* Mobile Menu Toggle */
         .mobile-menu-toggle {
             display: none;
             position: fixed;
-            top: 16px;
-            left: 16px;
+            top: 12px;
+            left: 12px;
             z-index: 200;
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px;
-            color: var(--accent-cyan);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
-        }
-
-        .mobile-menu-toggle:hover {
-            background: rgba(0, 212, 255, 0.1);
-            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4);
-            transform: scale(1.05);
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
         .mobile-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: var(--overlay);
             z-index: 150;
         }
 
@@ -460,7 +260,6 @@
             display: block;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -468,7 +267,7 @@
                 top: 0;
                 bottom: 0;
                 transform: translateX(-100%);
-                z-index: 200;
+                box-shadow: 4px 0 24px var(--shadow);
             }
 
             .sidebar.open {
@@ -481,49 +280,11 @@
 
             .main-content {
                 width: 100%;
-                padding-top: 60px;
+                padding-top: 48px;
             }
 
-            .footer {
-                padding: 40px 20px 24px;
-            }
-
-            .footer-brand h2 {
-                font-size: 18px;
-                letter-spacing: 4px;
-            }
-
-            .footer-tagline {
-                font-size: 12px;
-                letter-spacing: 1px;
-            }
-
-            .footer-links {
-                font-size: 11px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .footer {
-                padding: 32px 16px 20px;
-            }
-
-            .footer-brand h2 {
-                font-size: 16px;
-                letter-spacing: 3px;
-            }
-
-            .footer-tagline {
-                font-size: 11px;
-                letter-spacing: 0.5px;
-            }
-
-            .footer-copyright {
-                font-size: 11px;
-            }
-
-            .footer-links {
-                gap: 8px;
+            .demo-banner {
+                padding: 10px 16px;
             }
         }
 
@@ -533,159 +294,84 @@
             }
         }
 
-        .demo-banner {
-            background: rgba(10, 10, 15, 0.96);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.25);
-            padding: 12px 24px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            position: relative;
-            z-index: 5;
-        }
-
-        .demo-banner-text {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .demo-label {
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(0, 212, 255, 0.5);
-            color: var(--accent-cyan);
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-
-        .demo-message {
-            color: var(--text-secondary);
-        }
-
-        .demo-banner-cta {
-            padding: 8px 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(0, 212, 255, 0.6);
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.18), rgba(168, 85, 247, 0.24));
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            box-shadow: 0 4px 18px rgba(0, 212, 255, 0.35);
-            transition: all 0.25s ease;
-            white-space: nowrap;
-        }
-
-        .demo-banner-cta:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 28px rgba(0, 212, 255, 0.55);
-            border-color: var(--accent-blue-hover);
-        }
-
-        @media (max-width: 768px) {
-            .demo-banner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .demo-banner-cta {
-                width: 100%;
-                text-align: center;
-                justify-content: center;
-            }
-        }
-
         {% block extra_css %}{% endblock %}
     </style>
     {% block head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    <div class="bg-3d-container">
-        <div class="bg-3d-mesh"></div>
-        <div class="bg-3d-particles"></div>
-    </div>
     <div class="app-container">
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
-
-        <!-- Mobile Overlay -->
+        <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Open menu">Menu</button>
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- Side Navigation -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1>COSMIC AI</h1>
+                <h1>Cosmic AI</h1>
             </div>
             <div class="nav-menu">
                 <a href="/chat" class="nav-item {% if request.endpoint == 'chat_page' %}active{% endif %}">AI Chat</a>
                 {% block nav_items %}{% endblock %}
             </div>
+            <div class="sidebar-footer">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light or dark theme">
+                    Switch to light mode
+                </button>
+            </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="demo-banner">
                 <div class="demo-banner-text">
-                    <span class="demo-label">Demo Version</span>
-                    <span class="demo-message">
-                        This is a demo of Cosmic AI Chat. Responses use the built-in training data and keyword matching.
-                    </span>
+                    <span class="demo-label">Demo</span>
+                    <span>Cosmic AI Chat uses built-in training data and keyword matching.</span>
                 </div>
             </div>
             {% block content %}{% endblock %}
         </main>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <h2><span>COSMIC AI</span></h2>
+                <h2>Cosmic AI</h2>
                 <p class="footer-tagline">Empowering your workflow with AI</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <div class="footer-copyright">
-                © <strong>2026 Cosmic AI</strong>. All rights reserved.
-            </div>
+            <div class="footer-copyright">© <strong>2026 Cosmic AI</strong>. All rights reserved.</div>
         </div>
     </footer>
 
     <script>
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('mobileOverlay').classList.toggle('show');
         }
 
-        // Close sidebar when clicking a nav item on mobile
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    toggleSidebar();
-                }
+        document.querySelectorAll('.nav-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                if (window.innerWidth <= 768) toggleSidebar();
             });
         });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('cosmic-theme', theme);
+            var btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+            }
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', function () {
+            var current = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        (function () {
+            var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(theme);
+        })();
     </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
-
