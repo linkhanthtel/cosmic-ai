@@ -1,6 +1,6 @@
 # Cosmic AI Chat
 
-AI chatbot with **LangChain RAG** over your Q&A training data, built with Flask.
+AI chatbot with **LangChain RAG** over your Q&A training data, built with FastAPI.
 
 ## How it works
 
@@ -16,7 +16,8 @@ AI chatbot with **LangChain RAG** over your Q&A training data, built with Flask.
 ```bash
 pip install -r requirements.txt
 cp .env.example .env   # optional: add OPENAI_API_KEY
-python app.py
+uvicorn app:app --reload --port 8080
+# or: python app.py
 ```
 
 Open `http://localhost:8080` (redirects to `/chat`).
