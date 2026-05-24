@@ -308,7 +308,7 @@
                 <h1>Cosmic AI</h1>
             </div>
             <div class="nav-menu">
-                <a href="/chat" class="nav-item {% if request.endpoint == 'chat_page' %}active{% endif %}">AI Chat</a>
+                <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}">AI Chat</a>
                 {% block nav_items %}{% endblock %}
             </div>
             <div class="sidebar-footer">
