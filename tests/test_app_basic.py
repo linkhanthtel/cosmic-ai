@@ -8,7 +8,8 @@ from app import app
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 def test_root_redirects_to_chat(client):
@@ -20,6 +21,15 @@ def test_root_redirects_to_chat(client):
 def test_chat_page_renders(client):
     resp = client.get("/chat")
     assert resp.status_code == 200
+
+
+def test_health(client):
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "ok"
+    assert data["index_ready"] is True
+    assert data["training_samples"] > 0
 
 
 def test_chat_endpoint_basic(client):
