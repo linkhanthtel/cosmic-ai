@@ -1,22 +1,42 @@
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from chatbot import ChatBot
 
-app = FastAPI(title="Cosmic AI")
+chatbot: ChatBot | None = None
 templates = Jinja2Templates(directory="templates")
-
-chatbot = ChatBot()
 
 os.makedirs("data", exist_ok=True)
 os.makedirs("models", exist_ok=True)
 os.makedirs("templates", exist_ok=True)
+
+
+def get_chatbot() -> ChatBot:
+    global chatbot
+    if chatbot is None:
+        chatbot = ChatBot()
+    return chatbot
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Loading Cosmic AI knowledge base (embeddings + FAISS)...")
+    bot = get_chatbot()
+    samples = len(bot.training_data)
+    ready = bot.retriever is not None
+    mode = bot.get_personality_info().get("langchain_mode", "unknown")
+    print(f"Cosmic AI ready: {samples} Q&A pairs, index={'ok' if ready else 'missing'}, mode={mode}")
+    yield
+
+
+app = FastAPI(title="Cosmic AI", lifespan=lifespan)
 
 
 class ChatRequest(BaseModel):
@@ -41,6 +61,18 @@ class PersonalityAdjustRequest(BaseModel):
     value: Optional[float] = None
 
 
+@app.get("/health")
+def health():
+    bot = get_chatbot()
+    info = bot.get_personality_info()
+    return {
+        "status": "ok",
+        "training_samples": len(bot.training_data),
+        "index_ready": bot.retriever is not None,
+        "mode": info.get("langchain_mode"),
+    }
+
+
 @app.get("/")
 def index():
     return RedirectResponse(url="/chat", status_code=302)
@@ -58,7 +90,7 @@ def chat(body: ChatRequest):
         if not user_message:
             raise HTTPException(status_code=400, detail="No message provided")
 
-        response = chatbot.get_response(user_message)
+        response = get_chatbot().get_response(user_message)
         return {
             "response": response,
             "timestamp": datetime.now().isoformat(),
@@ -75,7 +107,7 @@ def train(body: TrainRequest):
         if not body.training_data:
             raise HTTPException(status_code=400, detail="No training data provided")
 
-        result = chatbot.train_model(body.training_data)
+        result = get_chatbot().train_model(body.training_data)
         return {
             "message": "Training completed successfully",
             "trained_samples": result["trained_samples"],
@@ -95,7 +127,7 @@ def add_training_data(body: AddDataRequest):
         if not question or not answer:
             raise HTTPException(status_code=400, detail="Both question and answer are required")
 
-        if chatbot.add_training_data(question, answer):
+        if get_chatbot().add_training_data(question, answer):
             return {
                 "message": "Training data added successfully",
                 "timestamp": datetime.now().isoformat(),
@@ -110,7 +142,7 @@ def add_training_data(body: AddDataRequest):
 @app.get("/get_training_data")
 def get_training_data():
     try:
-        training_data = chatbot.get_training_data()
+        training_data = get_chatbot().get_training_data()
         return {"training_data": training_data, "count": len(training_data)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -122,7 +154,7 @@ def delete_training_data(body: DeleteDataRequest):
         if body.index is None:
             raise HTTPException(status_code=400, detail="Index is required")
 
-        if chatbot.delete_training_data(body.index):
+        if get_chatbot().delete_training_data(body.index):
             return {
                 "message": "Training data deleted successfully",
                 "timestamp": datetime.now().isoformat(),
@@ -137,7 +169,7 @@ def delete_training_data(body: DeleteDataRequest):
 @app.post("/retrain")
 def retrain():
     try:
-        result = chatbot.retrain_model()
+        result = get_chatbot().retrain_model()
         return {
             "message": "Model retrained successfully",
             "trained_samples": result["trained_samples"],
@@ -150,12 +182,13 @@ def retrain():
 @app.get("/conversation/summary")
 def get_conversation_summary():
     try:
-        summary = chatbot.get_conversation_summary()
+        bot = get_chatbot()
+        summary = bot.get_conversation_summary()
         return {
             "summary": summary,
-            "topics": chatbot.conversation_topics,
+            "topics": bot.conversation_topics,
             "message_count": len(
-                [entry for entry in chatbot.conversation_history if "user" in entry]
+                [entry for entry in bot.conversation_history if "user" in entry]
             ),
         }
     except Exception as e:
@@ -165,7 +198,7 @@ def get_conversation_summary():
 @app.post("/conversation/clear")
 def clear_conversation():
     try:
-        message = chatbot.clear_conversation()
+        message = get_chatbot().clear_conversation()
         return {"message": message, "timestamp": datetime.now().isoformat()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -174,8 +207,9 @@ def clear_conversation():
 @app.get("/conversation/history")
 def get_conversation_history():
     try:
+        bot = get_chatbot()
         return {
-            "history": chatbot.conversation_history[-10:],
+            "history": bot.conversation_history[-10:],
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
@@ -185,7 +219,7 @@ def get_conversation_history():
 @app.get("/personality")
 def get_personality():
     try:
-        return chatbot.get_personality_info()
+        return get_chatbot().get_personality_info()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
@@ -196,10 +230,11 @@ def adjust_personality(body: PersonalityAdjustRequest):
         if not body.trait or body.value is None:
             raise HTTPException(status_code=400, detail="Trait and value are required")
 
-        result = chatbot.adjust_personality(body.trait, body.value)
+        bot = get_chatbot()
+        result = bot.adjust_personality(body.trait, body.value)
         return {
             "message": result,
-            "personality": chatbot.get_personality_info(),
+            "personality": bot.get_personality_info(),
         }
     except HTTPException:
         raise
