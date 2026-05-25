@@ -267,12 +267,21 @@ class ChatBot:
 
   def _retrieval_only_response(self, user_input):
     """No LLM: return the best matching stored answer from FAISS."""
-    docs = self.retriever.invoke(user_input)
-    if not docs:
-      return self._default_fallback(user_input)
+    max_distance = float(os.environ.get("RETRIEVAL_MAX_DISTANCE", "1.15"))
+    if self.vectorstore is not None:
+      scored = self.vectorstore.similarity_search_with_score(user_input, k=1)
+      if not scored:
+        return self._default_fallback(user_input)
+      best, distance = scored[0]
+      if distance > max_distance:
+        return self._default_fallback(user_input)
+    else:
+      docs = self.retriever.invoke(user_input)
+      if not docs:
+        return self._default_fallback(user_input)
+      best = docs[0]
 
     # Prefer metadata answer; fall back to parsing page_content
-    best = docs[0]
     answer = best.metadata.get("answer")
     if answer:
       return answer.strip()
