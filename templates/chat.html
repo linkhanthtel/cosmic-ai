@@ -309,8 +309,11 @@
 {% block content %}
 <div class="chat-app">
     <header class="chat-header">
-        <h2>AI Chat</h2>
-        <div class="topic-tags" id="topicTags"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <h2 style="margin:0;">AI Chat</h2>
+            <button type="button" class="send-button" style="padding:6px 10px;font-size:10px;" onclick="clearChat()">Clear</button>
+        </div>
+        <div class="topic-tags" id="topicTags" style="margin-top:8px;"></div>
     </header>
 
     <div class="chat-messages" id="chatContainer">
@@ -365,8 +368,18 @@
         el.scrollTop = el.scrollHeight;
     }
 
+    function apiErrorMessage(data, status) {
+        if (!data) return 'Request failed (' + status + ')';
+        if (typeof data.detail === 'string') return data.detail;
+        if (Array.isArray(data.detail)) {
+            return data.detail.map(function (e) { return e.msg || JSON.stringify(e); }).join('; ');
+        }
+        return data.error || data.message || 'Request failed (' + status + ')';
+    }
+
     function sendMessage() {
         var messageInput = document.getElementById('messageInput');
+        var sendButton = document.getElementById('sendButton');
         var message = messageInput.value.trim();
         if (!message || isTyping) return;
 
@@ -375,21 +388,47 @@
         messageInput.value = '';
         autoResize(messageInput);
         showTypingIndicator();
+        sendButton.disabled = true;
 
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: message })
         })
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+            return r.json().then(function (data) {
+                if (!r.ok) throw new Error(apiErrorMessage(data, r.status));
+                return data;
+            });
+        })
         .then(function (data) {
             hideTypingIndicator();
-            addMessageToChat(data.error ? 'Error: ' + data.error : data.response, 'bot');
+            addMessageToChat(data.response || 'No response.', 'bot');
         })
         .catch(function (err) {
             hideTypingIndicator();
             addMessageToChat('Error: ' + err.message, 'bot');
+        })
+        .finally(function () {
+            sendButton.disabled = false;
+            messageInput.focus();
         });
+    }
+
+    function clearChat() {
+        fetch('/conversation/clear', { method: 'POST' })
+            .then(function () {
+                var chatContainer = document.getElementById('chatContainer');
+                var typingIndicator = document.getElementById('typingIndicator');
+                chatContainer.innerHTML = '';
+                chatContainer.appendChild(typingIndicator);
+                var welcome = document.createElement('div');
+                welcome.className = 'welcome-message';
+                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Ask anything from the training knowledge base. I remember context within this conversation.</p>';
+                chatContainer.insertBefore(welcome, typingIndicator);
+                document.getElementById('topicTags').innerHTML = '';
+            })
+            .catch(function () {});
     }
 
     function showTypingIndicator() {
