@@ -15,14 +15,16 @@ AI chatbot with **LangChain RAG** over your Q&A training data, built with FastAP
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env   # optional: add OPENAI_API_KEY
+cp .env.example .env   # optional: OPENAI_API_KEY, RETRIEVAL_MAX_DISTANCE
 uvicorn app:app --reload --port 8080
 # or: python app.py
 ```
 
 Open `http://localhost:8080` (redirects to `/chat`).
 
-First run downloads the embedding model and builds the FAISS index (may take a minute).
+- First startup loads embeddings + FAISS (~10–30s). Watch the terminal for `Cosmic AI ready`.
+- Check status: `curl http://localhost:8080/health`
+- Learning script (Ollama agents, separate): `python ollama-learn.py`
 
 ## Retrain the knowledge index
 
