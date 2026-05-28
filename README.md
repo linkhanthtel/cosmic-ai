@@ -73,3 +73,16 @@ cosmic-ai/
 ├── Dockerfile
 └── fly.toml
 ```
+
+flowchart LR
+  User["User question"] --> Embed["Embed question"]
+  Embed --> FAISS["FAISS search"]
+  KB["training_data.json"] --> Index["Vector index"]
+  Index --> FAISS
+  FAISS --> Context["Top matching Q&A"]
+  Context --> Mode{OPENAI_API_KEY?}
+  Mode -->|No| Return["Return stored answer"]
+  Mode -->|Yes| LLM["OpenAI + context"]
+  LLM --> Answer["Final reply"]
+  Return --> Answer
+
