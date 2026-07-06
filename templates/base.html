@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}Cosmic AI{% endblock %}</title>
     <script>
         (function () {
@@ -18,7 +18,6 @@
             box-sizing: border-box;
         }
 
-        /* Dark theme (default) */
         :root,
         [data-theme="dark"] {
             color-scheme: dark;
@@ -36,14 +35,12 @@
             --surface-active: rgba(34, 211, 238, 0.14);
             --overlay: rgba(0, 0, 0, 0.5);
             --shadow: rgba(0, 0, 0, 0.35);
-            /* Legacy aliases used in blocks */
-            --accent-cyan: var(--accent);
-            --glass-bg: var(--bg-elevated);
-            --glass-border: var(--border);
-            --navy-accent: #2a3142;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
         }
 
-        /* Light theme */
         [data-theme="light"] {
             color-scheme: light;
             --bg: #f4f4f5;
@@ -60,10 +57,11 @@
             --surface-active: rgba(8, 145, 178, 0.12);
             --overlay: rgba(0, 0, 0, 0.35);
             --shadow: rgba(0, 0, 0, 0.08);
-            --accent-cyan: var(--accent);
-            --glass-bg: var(--bg-elevated);
-            --glass-border: var(--border);
-            --navy-accent: #d4d4d8;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            height: 100%;
         }
 
         body {
@@ -72,14 +70,15 @@
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            min-height: 100dvh;
             transition: background 0.2s ease, color 0.2s ease;
         }
 
         .app-container {
             display: flex;
             min-height: 100vh;
+            min-height: 100dvh;
             position: relative;
-            z-index: 1;
         }
 
         .sidebar {
@@ -91,6 +90,8 @@
             flex-direction: column;
             z-index: 100;
             transition: transform 0.25s ease, background 0.2s ease;
+            padding-top: var(--safe-top);
+            padding-left: var(--safe-left);
         }
 
         .sidebar-header {
@@ -135,7 +136,7 @@
         }
 
         .sidebar-footer {
-            padding: 12px 10px 16px;
+            padding: 12px 10px calc(16px + var(--safe-bottom));
             border-top: 1px solid var(--border);
         }
 
@@ -162,41 +163,15 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            min-height: 0;
             min-width: 0;
-        }
-
-        .demo-banner {
-            flex-shrink: 0;
-            padding: 10px 20px;
-            background: var(--bg-elevated);
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .demo-banner-text {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .demo-label {
-            padding: 2px 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border-strong);
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 10px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
+            width: 100%;
         }
 
         .footer {
             background: var(--bg-elevated);
             border-top: 1px solid var(--border);
-            padding: 32px 20px 20px;
+            padding: 24px 20px calc(20px + var(--safe-bottom));
             margin-top: auto;
         }
 
@@ -233,8 +208,8 @@
         .mobile-menu-toggle {
             display: none;
             position: fixed;
-            top: 12px;
-            left: 12px;
+            top: calc(12px + var(--safe-top));
+            left: calc(12px + var(--safe-left));
             z-index: 200;
             padding: 8px 12px;
             font-size: 13px;
@@ -266,6 +241,7 @@
                 left: 0;
                 top: 0;
                 bottom: 0;
+                width: min(280px, 85vw);
                 transform: translateX(-100%);
                 box-shadow: 4px 0 24px var(--shadow);
             }
@@ -279,18 +255,32 @@
             }
 
             .main-content {
-                width: 100%;
-                padding-top: 48px;
+                padding-top: calc(48px + var(--safe-top));
             }
 
-            .demo-banner {
-                padding: 10px 16px;
+            .page-chat .main-content {
+                padding-top: 0;
+            }
+
+            .page-chat .mobile-menu-toggle {
+                display: none;
             }
         }
 
         @media (min-width: 769px) {
             .mobile-overlay {
                 display: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar-header h1 {
+                font-size: 13px;
+            }
+
+            .nav-item {
+                font-size: 15px;
+                padding: 12px 14px;
             }
         }
 
@@ -319,12 +309,6 @@
         </nav>
 
         <main class="main-content">
-            <div class="demo-banner">
-                <div class="demo-banner-text">
-                    <span class="demo-label">Demo</span>
-                    <span>Cosmic AI Chat uses built-in training data and keyword matching.</span>
-                </div>
-            </div>
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -337,7 +321,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <div class="footer-copyright">© <strong>2026 Cosmic AI</strong>. All rights reserved.</div>
+            <div class="footer-copyright">&copy; <strong>2026 Cosmic AI</strong>. All rights reserved.</div>
         </div>
     </footer>
 
