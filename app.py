@@ -1,4 +1,5 @@
 import os
+import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Any, Optional
@@ -11,6 +12,9 @@ from pydantic import BaseModel, Field
 from chatbot import ChatBot
 
 chatbot: ChatBot | None = None
+_chatbot_lock = threading.Lock()
+_chatbot_loading = False
+_chatbot_ready = False
 templates = Jinja2Templates(directory="templates")
 
 os.makedirs("data", exist_ok=True)
@@ -21,18 +25,39 @@ os.makedirs("templates", exist_ok=True)
 def get_chatbot() -> ChatBot:
     global chatbot
     if chatbot is None:
-        chatbot = ChatBot()
+        with _chatbot_lock:
+            if chatbot is None:
+                chatbot = ChatBot()
     return chatbot
+
+
+def _load_chatbot_background() -> None:
+    global _chatbot_loading, _chatbot_ready
+    if _chatbot_ready or _chatbot_loading:
+        return
+    _chatbot_loading = True
+    try:
+        print("Loading Cosmic AI knowledge base (embeddings + FAISS)...")
+        bot = get_chatbot()
+        samples = len(bot.training_data)
+        ready = bot.retriever is not None
+        mode = bot.get_personality_info().get("langchain_mode", "unknown")
+        print(
+            f"Cosmic AI ready: {samples} Q&A pairs, "
+            f"index={'ok' if ready else 'missing'}, mode={mode}"
+        )
+        _chatbot_ready = True
+    except Exception as exc:
+        print(f"Cosmic AI failed to load knowledge base: {exc}")
+    finally:
+        _chatbot_loading = False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Loading Cosmic AI knowledge base (embeddings + FAISS)...")
-    bot = get_chatbot()
-    samples = len(bot.training_data)
-    ready = bot.retriever is not None
-    mode = bot.get_personality_info().get("langchain_mode", "unknown")
-    print(f"Cosmic AI ready: {samples} Q&A pairs, index={'ok' if ready else 'missing'}, mode={mode}")
+    # Load embeddings in the background so the server binds PORT immediately
+    # (Render/Fly health checks require an open port within ~90s).
+    threading.Thread(target=_load_chatbot_background, daemon=True).start()
     yield
 
 
@@ -63,10 +88,17 @@ class PersonalityAdjustRequest(BaseModel):
 
 @app.get("/health")
 def health():
+    if not _chatbot_ready and chatbot is None:
+        return {
+            "status": "starting",
+            "training_samples": 0,
+            "index_ready": False,
+            "mode": "loading",
+        }
     bot = get_chatbot()
     info = bot.get_personality_info()
     return {
-        "status": "ok",
+        "status": "ok" if _chatbot_ready or bot.retriever is not None else "starting",
         "training_samples": len(bot.training_data),
         "index_ready": bot.retriever is not None,
         "mode": info.get("langchain_mode"),
@@ -89,6 +121,12 @@ def chat(body: ChatRequest):
         user_message = body.message.strip()
         if not user_message:
             raise HTTPException(status_code=400, detail="No message provided")
+
+        if not _chatbot_ready and chatbot is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Knowledge base is still loading. Please try again in a moment.",
+            )
 
         response = get_chatbot().get_response(user_message)
         return {

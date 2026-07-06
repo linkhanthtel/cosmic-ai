@@ -1,14 +1,20 @@
 import json
+import time
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app import app
+from app import _chatbot_ready, app, get_chatbot
 
 
 @pytest.fixture
 def client():
     with TestClient(app) as test_client:
+        deadline = time.time() + 120
+        while not _chatbot_ready and time.time() < deadline:
+            time.sleep(0.2)
+        if not _chatbot_ready:
+            get_chatbot()
         yield test_client
 
 
