@@ -15,6 +15,7 @@ chatbot: ChatBot | None = None
 _chatbot_lock = threading.Lock()
 _chatbot_loading = False
 _chatbot_ready = False
+_chatbot_error: str | None = None
 templates = Jinja2Templates(directory="templates")
 
 os.makedirs("data", exist_ok=True)
@@ -32,10 +33,11 @@ def get_chatbot() -> ChatBot:
 
 
 def _load_chatbot_background() -> None:
-    global _chatbot_loading, _chatbot_ready
+    global _chatbot_loading, _chatbot_ready, _chatbot_error
     if _chatbot_ready or _chatbot_loading:
         return
     _chatbot_loading = True
+    _chatbot_error = None
     try:
         print("Loading Cosmic AI knowledge base (embeddings + FAISS)...")
         bot = get_chatbot()
@@ -48,7 +50,8 @@ def _load_chatbot_background() -> None:
         )
         _chatbot_ready = True
     except Exception as exc:
-        print(f"Cosmic AI failed to load knowledge base: {exc}")
+        _chatbot_error = f"{type(exc).__name__}: {exc}"
+        print(f"Cosmic AI failed to load knowledge base: {_chatbot_error}")
     finally:
         _chatbot_loading = False
 
@@ -88,6 +91,14 @@ class PersonalityAdjustRequest(BaseModel):
 
 @app.get("/health")
 def health():
+    if _chatbot_error is not None and not _chatbot_ready:
+        return {
+            "status": "error",
+            "training_samples": 0,
+            "index_ready": False,
+            "mode": "failed",
+            "error": _chatbot_error,
+        }
     if not _chatbot_ready and chatbot is None:
         return {
             "status": "starting",
@@ -121,6 +132,12 @@ def chat(body: ChatRequest):
         user_message = body.message.strip()
         if not user_message:
             raise HTTPException(status_code=400, detail="No message provided")
+
+        if _chatbot_error is not None and not _chatbot_ready:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Knowledge base failed to load: {_chatbot_error}",
+            )
 
         if not _chatbot_ready and chatbot is None:
             raise HTTPException(

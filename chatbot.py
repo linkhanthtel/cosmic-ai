@@ -1,8 +1,15 @@
 """
 Cosmic AI chatbot powered by LangChain (RAG over training_data.json).
 
-- Default: local embeddings (HuggingFace) + FAISS retrieval (no API key).
-- Optional: set OPENAI_API_KEY to synthesize answers with an LLM using retrieved context.
+Embeddings (EMBEDDINGS_BACKEND):
+  - local (default): local sentence-transformers model (needs PyTorch, ~500MB RAM).
+  - hf_api: compute embeddings via the Hugging Face Inference API (low memory,
+    recommended for small hosts like Render 512MB). Needs HF_TOKEN.
+
+Answer generation (auto-detected):
+  - HF_TOKEN set        -> free Hugging Face LLM (ChatHuggingFace).
+  - OPENAI_API_KEY set  -> OpenAI.
+  - neither             -> retrieval-only (best matching stored answer).
 """
 
 import json
@@ -18,7 +25,6 @@ except ImportError:
     pass
 
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -28,6 +34,13 @@ try:
 except ImportError:
     ChatHuggingFace = None
     HuggingFaceEndpoint = None
+
+# Remote (API) embeddings: no local PyTorch/sentence-transformers download,
+# which keeps memory low enough for small hosts (e.g. Render 512 MB).
+try:
+    from langchain_huggingface import HuggingFaceEndpointEmbeddings
+except ImportError:
+    HuggingFaceEndpointEmbeddings = None
 
 try:
     from langchain_openai import ChatOpenAI
@@ -137,9 +150,47 @@ class ChatBot:
     return self.train_model()
 
   # ----------------------------------------------------------- vector store
+  @staticmethod
+  def _hf_token():
+    return (
+      os.environ.get("HUGGINGFACEHUB_API_TOKEN")
+      or os.environ.get("HUGGINGFACE_API_KEY")
+      or os.environ.get("HF_TOKEN")
+    )
+
   def _get_embeddings(self):
-    if self._embeddings is None:
-      self._embeddings = HuggingFaceEmbeddings(model_name=self.EMBEDDING_MODEL)
+    """Build the embedding backend.
+
+    EMBEDDINGS_BACKEND=hf_api  -> compute embeddings on Hugging Face servers
+      (no local PyTorch download; low memory; good for small hosts like Render).
+    EMBEDDINGS_BACKEND=local (default) -> local sentence-transformers model.
+
+    Both use the SAME model, so a FAISS index built one way is compatible
+    with queries embedded the other way.
+    """
+    if self._embeddings is not None:
+      return self._embeddings
+
+    backend = os.environ.get("EMBEDDINGS_BACKEND", "local").strip().lower()
+    token = self._hf_token()
+
+    if backend == "hf_api":
+      if HuggingFaceEndpointEmbeddings is not None and token:
+        self._embeddings = HuggingFaceEndpointEmbeddings(
+          model=self.EMBEDDING_MODEL,
+          huggingfacehub_api_token=token,
+        )
+        return self._embeddings
+      print(
+        "EMBEDDINGS_BACKEND=hf_api requested but no HF token / package available; "
+        "falling back to local embeddings."
+      )
+
+    # Local backend (default). Imported lazily so PyTorch is only loaded when
+    # actually running local embeddings.
+    from langchain_huggingface import HuggingFaceEmbeddings
+
+    self._embeddings = HuggingFaceEmbeddings(model_name=self.EMBEDDING_MODEL)
     return self._embeddings
 
   def _documents_from_training_data(self):

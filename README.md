@@ -56,13 +56,43 @@ pip install pytest
 pytest
 ```
 
-## Deploy (Fly.io)
+## Deploy
+
+### Memory: pick an embeddings backend
+
+Running local embeddings loads PyTorch (~500 MB+ RAM). On small hosts (e.g. Render
+free/starter 512 MB) this causes slow startups and out-of-memory crashes — which
+show up in the browser as **"Knowledge base is still loading. Please try again in
+a moment."** (the background loader never finishes).
+
+Fix: set `EMBEDDINGS_BACKEND=hf_api` in production so embeddings are computed on
+Hugging Face servers instead of locally. This keeps memory low enough for 512 MB
+and makes startup fast. It requires `HF_TOKEN`.
+
+### Render
+
+`render.yaml` already sets `EMBEDDINGS_BACKEND=hf_api` and `HF_MODEL`. In the Render
+dashboard set the secret `HF_TOKEN` (type: Read token from Hugging Face). Redeploy.
+Verify with `curl https://<your-app>.onrender.com/health` — `status` should become
+`ok` (or `error` with a message if something failed).
+
+### Fly.io
 
 ```bash
 fly deploy
 ```
 
-Use at least **1GB RAM** (embeddings + FAISS). Set secrets: `fly secrets set OPENAI_API_KEY=sk-...`
+Either use `EMBEDDINGS_BACKEND=hf_api` (recommended, low memory) or give the machine
+at least **1 GB RAM** for local embeddings. Set secrets:
+`fly secrets set HF_TOKEN=hf_... EMBEDDINGS_BACKEND=hf_api`
+
+### Troubleshooting
+
+- **"Knowledge base is still loading" forever** → startup is too slow or OOM-crashed.
+  Set `EMBEDDINGS_BACKEND=hf_api` (+ `HF_TOKEN`), or use ≥1 GB RAM. Check `/health`
+  for an `error` field, and check the deploy logs.
+- **"model_not_supported" from Hugging Face** → change `HF_MODEL` (e.g.
+  `meta-llama/Llama-3.1-8B-Instruct` or `Qwen/Qwen2.5-7B-Instruct`).
 
 ## Project structure
 

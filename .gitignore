@@ -39,7 +39,10 @@ models/chatbot_model.pkl
 models/vectorizer.pkl
 models/label_encoder.pkl
 
-# FAISS index is rebuilt locally / on deploy (optional: commit for faster cold start)
+# FAISS index is rebuilt at startup from data/training_data.json using whichever
+# EMBEDDINGS_BACKEND is configured (so the index always matches the query
+# embeddings). With EMBEDDINGS_BACKEND=hf_api this rebuild is cheap and uses
+# little memory (no local PyTorch), which is what makes small hosts viable.
 models/faiss_index/
 
 # Local env template is committed; real secrets go in .env
