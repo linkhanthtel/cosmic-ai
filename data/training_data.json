@@ -346,5 +346,117 @@
   {
     "question": "What is edge computing and how does it relate to cloud computing?",
     "answer": "Edge computing is a distributed computing paradigm that processes data closer to where it's generated—at the 'edge' of the network—rather than sending everything to centralized cloud data centers potentially thousands of miles away. This architectural approach addresses latency, bandwidth, and privacy challenges that arise when all data must travel to distant cloud servers for processing. In edge computing, computational resources like processors, storage, and networking capabilities are deployed in edge locations such as cell towers, local data centers, IoT gateways, or even on the devices themselves. For example, a smart factory might process machine sensor data locally to make real-time decisions about equipment maintenance or quality control, only sending summarized data to the cloud for long-term analysis. Edge computing doesn't replace cloud computing but complements it in a hybrid architecture. The cloud remains ideal for intensive computing tasks, big data analytics, machine learning model training, and centralized management, while edge handles time-sensitive processing, reduces bandwidth costs by filtering data locally, ensures functionality even without internet connectivity, and addresses data sovereignty requirements by keeping sensitive information local. The relationship between edge and cloud is synergistic: edge devices handle immediate, latency-sensitive tasks and preprocess data, while the cloud provides computational power for complex analysis, stores historical data, manages edge device fleets, and deploys updates. Real-world applications include autonomous vehicles that need millisecond response times for collision avoidance, augmented reality systems requiring low latency for immersive experiences, smart cities processing video streams from thousands of cameras locally rather than overwhelming network bandwidth, retail stores using edge AI for real-time inventory management and customer analytics, and industrial IoT where machinery makes split-second decisions. As 5G networks roll out with their low-latency capabilities, edge computing is becoming increasingly important, with edge nodes potentially located at 5G base stations to enable new applications requiring both high bandwidth and minimal latency."
+  },
+  {
+    "question": "What is TypeScript?",
+    "answer": "TypeScript is a strongly typed superset of JavaScript developed by Microsoft that compiles to plain JavaScript. It adds optional static typing, interfaces, enums, and generics on top of JavaScript, helping developers catch errors at compile time rather than runtime. TypeScript improves code quality, editor autocompletion, and maintainability for large codebases, and is widely used with frameworks like Angular, React, and Node.js."
+  },
+  {
+    "question": "What is Rust?",
+    "answer": "Rust is a systems programming language focused on safety, speed, and concurrency. Its ownership and borrowing model guarantees memory safety without a garbage collector, preventing common bugs like null pointer dereferences and data races at compile time. Rust is used for performance-critical software such as operating systems, game engines, web assembly, and command-line tools."
+  },
+  {
+    "question": "What is Go?",
+    "answer": "Go (also called Golang) is an open-source programming language created at Google, designed for simplicity, fast compilation, and built-in concurrency through goroutines and channels. It's statically typed and compiled, making it efficient for building scalable network services, cloud infrastructure, and command-line tools. Popular projects like Docker and Kubernetes are written in Go."
+  },
+  {
+    "question": "What is a REST API?",
+    "answer": "A REST API (Representational State Transfer) is a web service architecture that uses standard HTTP methods—GET, POST, PUT, PATCH, and DELETE—to perform operations on resources identified by URLs. REST APIs are stateless, meaning each request contains all the information needed to process it, and they typically exchange data in JSON format. They are simple, scalable, and widely used for connecting frontend applications to backend services."
+  },
+  {
+    "question": "What is a neural network?",
+    "answer": "A neural network is a machine learning model inspired by the structure of the human brain. It consists of layers of interconnected nodes (neurons), where each connection has a weight that is adjusted during training. Data passes through an input layer, one or more hidden layers, and an output layer, with each neuron applying an activation function. Neural networks power deep learning applications like image recognition, natural language processing, and speech recognition."
+  },
+  {
+    "question": "What is deep learning?",
+    "answer": "Deep learning is a subset of machine learning that uses neural networks with many layers (deep neural networks) to automatically learn hierarchical representations from large amounts of data. It excels at tasks like image classification, natural language processing, and speech recognition. Unlike traditional machine learning, deep learning reduces the need for manual feature engineering by learning features directly from raw data."
+  },
+  {
+    "question": "What is natural language processing?",
+    "answer": "Natural Language Processing (NLP) is a field of artificial intelligence focused on enabling computers to understand, interpret, and generate human language. It combines linguistics with machine learning to power applications like chatbots, machine translation, sentiment analysis, text summarization, and voice assistants. Modern NLP relies heavily on transformer-based models like BERT and GPT."
+  },
+  {
+    "question": "What is a large language model?",
+    "answer": "A large language model (LLM) is a type of AI model trained on vast amounts of text data to understand and generate human-like language. Built on the transformer architecture, LLMs learn statistical patterns in language and can perform tasks like answering questions, writing text, summarizing, translating, and coding. Examples include GPT, Claude, Gemini, and Llama. They generate responses by predicting the most likely next token given the preceding context."
+  },
+  {
+    "question": "What is a transformer model?",
+    "answer": "A transformer is a neural network architecture introduced in the 2017 paper 'Attention Is All You Need.' It relies on a self-attention mechanism that lets the model weigh the importance of different words in a sequence relative to each other, enabling it to capture long-range dependencies efficiently and process sequences in parallel. Transformers are the foundation of modern large language models and have revolutionized natural language processing and beyond."
+  },
+  {
+    "question": "What is RAG (Retrieval-Augmented Generation)?",
+    "answer": "Retrieval-Augmented Generation (RAG) is an AI technique that combines a retrieval system with a language model. Instead of relying only on knowledge stored in the model's parameters, RAG first retrieves relevant documents from an external knowledge base (often using vector embeddings and similarity search), then provides that context to the language model to generate accurate, grounded responses. This reduces hallucinations and lets models answer questions using up-to-date or domain-specific information."
+  },
+  {
+    "question": "What is a vector database?",
+    "answer": "A vector database is a specialized database designed to store and search high-dimensional vectors, which are numerical representations (embeddings) of data like text, images, or audio. It uses similarity search algorithms to find the vectors closest to a query vector, enabling semantic search where results are ranked by meaning rather than exact keyword matches. Popular vector databases and libraries include FAISS, Pinecone, Weaviate, and Chroma, and they are essential for RAG systems and recommendation engines."
+  },
+  {
+    "question": "What are embeddings?",
+    "answer": "Embeddings are numerical vector representations of data such as words, sentences, images, or documents, where semantically similar items are placed close together in a high-dimensional space. They capture meaning and relationships, allowing machines to measure similarity using distance metrics like cosine similarity. Embeddings are the backbone of semantic search, recommendation systems, clustering, and retrieval-augmented generation."
+  },
+  {
+    "question": "What is the difference between supervised and unsupervised learning?",
+    "answer": "Supervised learning trains a model on labeled data, where each input has a known correct output, so the model learns to map inputs to outputs for tasks like classification and regression. Unsupervised learning works with unlabeled data and aims to discover hidden patterns or structures on its own, used for tasks like clustering, dimensionality reduction, and anomaly detection. In short, supervised learning predicts known labels, while unsupervised learning finds unknown structure."
+  },
+  {
+    "question": "What is overfitting in machine learning?",
+    "answer": "Overfitting occurs when a machine learning model learns the training data too well, including its noise and random fluctuations, causing it to perform excellently on training data but poorly on new, unseen data. It means the model has memorized rather than generalized. Common techniques to prevent overfitting include using more training data, regularization, dropout, cross-validation, early stopping, and simplifying the model."
+  },
+  {
+    "question": "What is CI/CD?",
+    "answer": "CI/CD stands for Continuous Integration and Continuous Delivery/Deployment. Continuous Integration is the practice of frequently merging code changes into a shared repository, where automated builds and tests run to catch issues early. Continuous Delivery extends this by automatically preparing tested code for release, while Continuous Deployment automatically pushes every passing change to production. Together, CI/CD pipelines automate building, testing, and deploying software, enabling faster and more reliable releases."
+  },
+  {
+    "question": "What is agile methodology?",
+    "answer": "Agile is an iterative approach to software development that emphasizes flexibility, collaboration, customer feedback, and delivering working software in small, frequent increments. Instead of planning an entire project upfront, agile teams work in short cycles called sprints, continuously adapting to changing requirements. Popular agile frameworks include Scrum and Kanban, which promote regular communication, transparency, and continuous improvement."
+  },
+  {
+    "question": "What is object-oriented programming?",
+    "answer": "Object-oriented programming (OOP) is a programming paradigm that organizes code around objects, which bundle data (attributes) and behavior (methods) together. Its four core principles are encapsulation (hiding internal state), inheritance (reusing code through parent-child relationships), polymorphism (using a common interface for different types), and abstraction (exposing only essential details). Languages like Java, Python, C++, and C# support OOP, which helps make code modular, reusable, and easier to maintain."
+  },
+  {
+    "question": "What is functional programming?",
+    "answer": "Functional programming is a paradigm that treats computation as the evaluation of mathematical functions, avoiding shared mutable state and side effects. It emphasizes pure functions (same output for the same input), immutability, higher-order functions, and function composition. This style makes code more predictable, easier to test, and well-suited for concurrency. Languages like Haskell, Clojure, and Elixir are functional, and many mainstream languages like JavaScript and Python support functional features."
+  },
+  {
+    "question": "What is a microservices architecture?",
+    "answer": "Microservices architecture is a design approach where an application is built as a collection of small, independent services that each handle a specific business capability and communicate over well-defined APIs, typically HTTP or messaging. Each service can be developed, deployed, and scaled independently, often by different teams using different technologies. This contrasts with a monolithic architecture where everything is bundled into one unit. Microservices improve scalability and flexibility but add complexity in deployment, monitoring, and inter-service communication."
+  },
+  {
+    "question": "What is caching?",
+    "answer": "Caching is the technique of storing copies of frequently accessed data in a fast-access storage layer so future requests can be served more quickly without recomputing or re-fetching from the original source. Caches can exist at many levels, including the browser, CDN, application memory, and databases. Tools like Redis and Memcached are commonly used for caching. Effective caching improves performance and reduces load, but requires strategies to handle cache invalidation and keep data fresh."
+  },
+  {
+    "question": "What is a load balancer?",
+    "answer": "A load balancer is a system that distributes incoming network traffic across multiple servers to ensure no single server becomes overwhelmed. This improves application availability, reliability, and scalability. Load balancers use algorithms like round-robin, least connections, or IP hashing to route requests, and they can perform health checks to avoid sending traffic to failed servers. They are essential for high-traffic applications and are offered by cloud providers and tools like NGINX and HAProxy."
+  },
+  {
+    "question": "What are the SOLID principles?",
+    "answer": "SOLID is a set of five design principles for writing maintainable, scalable object-oriented software: Single Responsibility (a class should have one reason to change), Open/Closed (open for extension, closed for modification), Liskov Substitution (subtypes must be substitutable for their base types), Interface Segregation (prefer many specific interfaces over one general-purpose interface), and Dependency Inversion (depend on abstractions, not concrete implementations). Following SOLID leads to cleaner, more flexible, and testable code."
+  },
+  {
+    "question": "What is the difference between authentication and authorization?",
+    "answer": "Authentication is the process of verifying who a user is, confirming their identity through credentials like passwords, biometrics, or tokens. Authorization is the process of determining what an authenticated user is allowed to do, controlling access to resources and actions based on permissions or roles. In short, authentication answers 'Who are you?' while authorization answers 'What are you allowed to do?' Both are essential for securing applications."
+  },
+  {
+    "question": "What is a webhook?",
+    "answer": "A webhook is a way for one application to send real-time data to another application automatically when a specific event occurs. Instead of repeatedly polling an API for changes, a webhook delivers an HTTP POST request with event data to a configured URL as soon as the event happens. Webhooks are commonly used for notifications, payment confirmations, CI/CD triggers, and integrating services like GitHub, Stripe, and Slack."
+  },
+  {
+    "question": "What is Linux?",
+    "answer": "Linux is a free, open-source, Unix-like operating system kernel first released by Linus Torvalds in 1991. Combined with system software, it forms complete operating systems called distributions, such as Ubuntu, Fedora, Debian, and Arch Linux. Linux is known for its stability, security, and flexibility, and it powers the vast majority of servers, cloud infrastructure, supercomputers, and Android devices."
+  },
+  {
+    "question": "What is a compiler?",
+    "answer": "A compiler is a program that translates source code written in a high-level programming language into machine code, bytecode, or another target language that a computer can execute. It performs steps like lexical analysis, parsing, semantic analysis, optimization, and code generation, catching many errors before the program runs. Compiled programs typically run faster than interpreted ones because the translation happens ahead of time."
+  },
+  {
+    "question": "What is recursion in programming?",
+    "answer": "Recursion is a programming technique where a function calls itself to solve a problem by breaking it down into smaller subproblems of the same type. A recursive function needs a base case that stops the recursion and a recursive case that moves toward that base case. Recursion is elegant for problems like tree traversal, factorials, and the Fibonacci sequence, but it can use more memory due to the call stack and may cause stack overflow if not bounded properly."
+  },
+  {
+    "question": "What is Big O notation?",
+    "answer": "Big O notation is a mathematical way to describe the performance or complexity of an algorithm in terms of how its running time or memory usage grows as the input size increases. It focuses on the worst-case scenario and ignores constants. Common complexities include O(1) constant time, O(log n) logarithmic, O(n) linear, O(n log n) linearithmic, O(n^2) quadratic, and O(2^n) exponential. Big O helps developers compare algorithms and choose efficient solutions."
   }
 ]
