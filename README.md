@@ -7,9 +7,10 @@ AI chatbot with **LangChain RAG** over your Q&A training data, built with FastAP
 1. **Training data** — Q&A pairs in `data/training_data.json`
 2. **Embeddings** — `sentence-transformers/all-MiniLM-L6-v2` (local, no API key)
 3. **Vector store** — FAISS index in `models/faiss_index/`
-4. **Answers**
-   - **Default (no API key):** returns the best matching answer from retrieved documents
-   - **With `OPENAI_API_KEY`:** LangChain RAG + OpenAI synthesizes an answer from retrieved context
+4. **Answers** — `chatbot.py` auto-detects the best available mode:
+   - **With `HF_TOKEN` (free, recommended):** LangChain RAG + a free Hugging Face LLM (`ChatHuggingFace`) synthesizes an answer from retrieved context
+   - **With `OPENAI_API_KEY`:** LangChain RAG + OpenAI synthesizes the answer
+   - **Neither set:** retrieval-only — returns the best matching stored answer
 
 ## Installation
 
@@ -39,7 +40,11 @@ python train_model.py
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENAI_API_KEY` | No | Enables LLM RAG mode |
+| `HF_TOKEN` | No | Free Hugging Face token; enables the free HF LLM RAG mode (and speeds up embedding downloads) |
+| `HF_MODEL` | No | Default `meta-llama/Llama-3.1-8B-Instruct` (also try `Qwen/Qwen2.5-7B-Instruct`) |
+| `HF_TEMPERATURE` | No | Default `0.3` |
+| `HF_MAX_NEW_TOKENS` | No | Default `512` |
+| `OPENAI_API_KEY` | No | Enables OpenAI RAG mode (used only if `HF_TOKEN` is not set) |
 | `OPENAI_MODEL` | No | Default `gpt-4o-mini` |
 | `OPENAI_TEMPERATURE` | No | Default `0.3` |
 | `PORT` | No | Default `8080` |

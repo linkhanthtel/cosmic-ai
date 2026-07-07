@@ -10,11 +10,25 @@ import os
 import re
 from datetime import datetime
 
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+
+try:
+    from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+except ImportError:
+    ChatHuggingFace = None
+    HuggingFaceEndpoint = None
+
 try:
     from langchain_openai import ChatOpenAI
 except ImportError:
@@ -52,6 +66,7 @@ class ChatBot:
     self.vectorstore = None
     self.retriever = None
     self._llm = None
+    self._llm_provider = None
     self._rag_prompt = None
 
     self.load_training_data()
@@ -188,18 +203,64 @@ class ChatBot:
       search_kwargs={"k": 4},
     )
 
+  def _build_llm(self):
+    """Pick an LLM for RAG generation.
+
+    Priority:
+      1. Free Hugging Face Inference API (needs a free HF token)
+      2. OpenAI (optional, paid)
+      3. None -> caller falls back to retrieval-only answers
+    """
+    # 1) Hugging Face Inference API (free tier).
+    hf_token = (
+      os.environ.get("HUGGINGFACEHUB_API_TOKEN")
+      or os.environ.get("HUGGINGFACE_API_KEY")
+      or os.environ.get("HF_TOKEN")
+    )
+    if hf_token and ChatHuggingFace is not None and HuggingFaceEndpoint is not None:
+      try:
+        endpoint = HuggingFaceEndpoint(
+          repo_id=os.environ.get("HF_MODEL", "meta-llama/Llama-3.1-8B-Instruct"),
+          task="text-generation",
+          huggingfacehub_api_token=hf_token,
+          temperature=float(os.environ.get("HF_TEMPERATURE", "0.3")),
+          max_new_tokens=int(os.environ.get("HF_MAX_NEW_TOKENS", "512")),
+          provider=os.environ.get("HF_PROVIDER", "auto"),
+        )
+        llm = ChatHuggingFace(llm=endpoint)
+        self._llm_provider = "huggingface"
+        return llm
+      except Exception as e:
+        print(f"Could not initialize Hugging Face LLM, falling back: {e}")
+
+    # 2) OpenAI (optional).
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if api_key and ChatOpenAI is not None:
+      try:
+        llm = ChatOpenAI(
+          model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+          temperature=float(os.environ.get("OPENAI_TEMPERATURE", "0.3")),
+          api_key=api_key,
+        )
+        self._llm_provider = "openai"
+        return llm
+      except Exception as e:
+        print(f"Could not initialize OpenAI LLM, falling back: {e}")
+
+    # 3) No LLM configured -> retrieval-only mode.
+    self._llm_provider = None
+    return None
+
   def _setup_llm_chain(self):
     self._llm = None
+    self._llm_provider = None
     self._rag_prompt = None
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key or ChatOpenAI is None or self.retriever is None:
+    if self.retriever is None:
       return
 
-    self._llm = ChatOpenAI(
-      model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
-      temperature=float(os.environ.get("OPENAI_TEMPERATURE", "0.3")),
-      api_key=api_key,
-    )
+    self._llm = self._build_llm()
+    if self._llm is None:
+      return
 
     self._rag_prompt = ChatPromptTemplate.from_messages(
       [
@@ -346,6 +407,8 @@ class ChatBot:
       "traits": self.personality_traits,
       "mood": self.conversation_mood,
       "conversation_length": len(self.conversation_history),
-      "langchain_mode": "openai_rag" if self._llm else "retrieval_only",
+      "langchain_mode": (
+        f"{self._llm_provider}_rag" if self._llm else "retrieval_only"
+      ),
       "embedding_model": self.EMBEDDING_MODEL,
     }
