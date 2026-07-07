@@ -175,16 +175,23 @@ class ChatBot:
     token = self._hf_token()
 
     if backend == "hf_api":
-      if HuggingFaceEndpointEmbeddings is not None and token:
-        self._embeddings = HuggingFaceEndpointEmbeddings(
-          model=self.EMBEDDING_MODEL,
-          huggingfacehub_api_token=token,
+      if HuggingFaceEndpointEmbeddings is None:
+        raise RuntimeError(
+          "EMBEDDINGS_BACKEND=hf_api but langchain-huggingface is not installed. "
+          "Install it or set EMBEDDINGS_BACKEND=local."
         )
-        return self._embeddings
-      print(
-        "EMBEDDINGS_BACKEND=hf_api requested but no HF token / package available; "
-        "falling back to local embeddings."
+      if not token:
+        # Do NOT silently fall back to local: on a small host that loads PyTorch
+        # and gets OOM-killed with no catchable error. Fail loudly instead.
+        raise RuntimeError(
+          "EMBEDDINGS_BACKEND=hf_api requires a Hugging Face token. "
+          "Set HF_TOKEN (Render dashboard -> Environment) or use EMBEDDINGS_BACKEND=local."
+        )
+      self._embeddings = HuggingFaceEndpointEmbeddings(
+        model=self.EMBEDDING_MODEL,
+        huggingfacehub_api_token=token,
       )
+      return self._embeddings
 
     # Local backend (default). Imported lazily so PyTorch is only loaded when
     # actually running local embeddings.
