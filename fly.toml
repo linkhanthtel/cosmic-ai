@@ -6,12 +6,20 @@ primary_region = "iad"
 
 [env]
   PORT = "8080"
+  # Compute embeddings on Hugging Face servers (no local PyTorch) -> low memory,
+  # fast startup. Requires the HF_TOKEN secret: fly secrets set HF_TOKEN=hf_...
+  EMBEDDINGS_BACKEND = "hf_api"
+  HF_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
 
 [http_service]
   internal_port = 8080
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ["app"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
 
