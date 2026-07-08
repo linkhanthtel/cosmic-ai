@@ -1,0 +1,26 @@
+# Keep secrets out of the image (set HF_TOKEN via `fly secrets set` instead)
+.env
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+
+# Git / IDE / OS
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# FAISS index is rebuilt at startup with the configured EMBEDDINGS_BACKEND
+# (baking in a locally-built index could mismatch hf_api query embeddings).
+models/faiss_index/
