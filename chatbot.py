@@ -4,7 +4,7 @@ Cosmic AI chatbot powered by LangChain (RAG over training_data.json).
 Embeddings (EMBEDDINGS_BACKEND):
   - local (default): local sentence-transformers model (needs PyTorch, ~500MB RAM).
   - hf_api: compute embeddings via the Hugging Face Inference API (low memory,
-    recommended for small hosts like Render 512MB). Needs HF_TOKEN.
+    recommended for small hosts like Fly.io 512MB). Needs HF_TOKEN.
 
 Answer generation (auto-detected):
   - HF_TOKEN set        -> free Hugging Face LLM (ChatHuggingFace).
@@ -36,7 +36,7 @@ except ImportError:
     HuggingFaceEndpoint = None
 
 # Remote (API) embeddings: no local PyTorch/sentence-transformers download,
-# which keeps memory low enough for small hosts (e.g. Render 512 MB).
+# which keeps memory low enough for small hosts (e.g. Fly.io 512 MB).
 try:
     from langchain_huggingface import HuggingFaceEndpointEmbeddings
 except ImportError:
@@ -162,7 +162,7 @@ class ChatBot:
     """Build the embedding backend.
 
     EMBEDDINGS_BACKEND=hf_api  -> compute embeddings on Hugging Face servers
-      (no local PyTorch download; low memory; good for small hosts like Render).
+      (no local PyTorch download; low memory; good for small hosts like Fly.io).
     EMBEDDINGS_BACKEND=local (default) -> local sentence-transformers model.
 
     Both use the SAME model, so a FAISS index built one way is compatible
@@ -185,7 +185,8 @@ class ChatBot:
         # and gets OOM-killed with no catchable error. Fail loudly instead.
         raise RuntimeError(
           "EMBEDDINGS_BACKEND=hf_api requires a Hugging Face token. "
-          "Set HF_TOKEN (Render dashboard -> Environment) or use EMBEDDINGS_BACKEND=local."
+          "Set the HF_TOKEN secret (fly secrets set HF_TOKEN=hf_...) "
+          "or use EMBEDDINGS_BACKEND=local."
         )
       self._embeddings = HuggingFaceEndpointEmbeddings(
         model=self.EMBEDDING_MODEL,
