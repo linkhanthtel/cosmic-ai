@@ -59,7 +59,7 @@ def _load_chatbot_background() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load embeddings in the background so the server binds PORT immediately
-    # (Render/Fly health checks require an open port within ~90s).
+    # (Fly health checks require an open port within ~90s).
     threading.Thread(target=_load_chatbot_background, daemon=True).start()
     yield
 
