@@ -1,20 +1,9 @@
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 jinja2>=3.1.0
-requests>=2.31.0
 gunicorn>=21.0.0
 python-dotenv>=1.0.0
 
-# LangChain chatbot (RAG)
-langchain>=0.3.0
-langchain-community>=0.3.0
+# LangChain + free Hugging Face model
 langchain-core>=0.3.0
-langchain-openai>=0.2.0
 langchain-huggingface>=0.1.0
-langchain-ollama>=0.2.0
-ollama>=0.4.0
-faiss-cpu>=1.8.0
-sentence-transformers>=3.0.0
-
-# Development / testing (install locally: pip install pytest)
-# pytest>=8.0.0

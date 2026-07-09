@@ -6,9 +6,7 @@ primary_region = "iad"
 
 [env]
   PORT = "8080"
-  # Compute embeddings on Hugging Face servers (no local PyTorch) -> low memory,
-  # fast startup. Requires the HF_TOKEN secret: fly secrets set HF_TOKEN=hf_...
-  EMBEDDINGS_BACKEND = "hf_api"
+  # The HF model to call. Set the token separately: fly secrets set HF_TOKEN=hf_...
   HF_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
 
 [http_service]

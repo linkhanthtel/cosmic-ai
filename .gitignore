@@ -33,17 +33,5 @@ Thumbs.db
 # Environment secrets
 .env
 
-# Legacy sklearn models (replaced by LangChain FAISS)
-models/*.pkl
-models/chatbot_model.pkl
-models/vectorizer.pkl
-models/label_encoder.pkl
-
-# FAISS index is rebuilt at startup from data/training_data.json using whichever
-# EMBEDDINGS_BACKEND is configured (so the index always matches the query
-# embeddings). With EMBEDDINGS_BACKEND=hf_api this rebuild is cheap and uses
-# little memory (no local PyTorch), which is what makes small hosts viable.
-models/faiss_index/
-
 # Local env template is committed; real secrets go in .env
 !.env.example

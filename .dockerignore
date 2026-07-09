@@ -20,7 +20,3 @@ __pycache__/
 .idea/
 .DS_Store
 *.log
-
-# FAISS index is rebuilt at startup with the configured EMBEDDINGS_BACKEND
-# (baking in a locally-built index could mismatch hf_api query embeddings).
-models/faiss_index/
