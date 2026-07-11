@@ -58,16 +58,18 @@
         font-weight: 600;
         font-family: inherit;
         color: var(--text-primary);
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
         cursor: pointer;
-        transition: border-color 0.15s ease, background 0.15s ease;
+        transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .chat-menu-btn:hover {
-        border-color: var(--border-strong);
+        border-color: var(--accent);
         background: var(--surface-hover);
+        color: var(--accent);
     }
 
     .chat-header-title {
@@ -246,7 +248,7 @@
     }
 
     .welcome-message::before {
-        content: '◆';
+        content: '';
         display: block;
         font-size: 10px;
         color: var(--accent);
@@ -384,6 +386,10 @@
 
     /* Mobile */
     @media (max-width: 768px) {
+        .page-chat .app-container {
+            overflow: visible;
+        }
+
         .chat-menu-btn {
             display: block;
         }
@@ -457,7 +463,7 @@
 <div class="chat-layout">
     <header class="chat-header">
         <div class="chat-header-inner">
-            <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">Menu</button>
+            <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">Menu</button>
             <h2 class="chat-header-title">New Chat</h2>
             <div class="chat-header-actions">
                 <button type="button" class="btn-secondary" onclick="clearChat()">Clear</button>
@@ -470,7 +476,7 @@
             <div class="chat-messages-inner">
                 <div class="welcome-message">
                     <h2>Cosmic AI</h2>
-                    <p>Neural interface online. Ask me anything — powered by LangChain &amp; Hugging Face.</p>
+                    <p>Ask me anything</p>
                 </div>
                 <div class="typing-indicator" id="typingIndicator">
                     <div class="avatar bot">AI</div>

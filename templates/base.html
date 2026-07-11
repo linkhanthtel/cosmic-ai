@@ -129,12 +129,39 @@
             transition: transform 0.25s ease, background 0.3s ease;
             padding-top: var(--safe-top);
             padding-left: var(--safe-left);
+            padding-right: var(--safe-right);
             box-shadow: 4px 0 24px var(--shadow);
         }
 
         .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
             padding: 20px 16px;
             border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-close {
+            display: none;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            font-size: 20px;
+            line-height: 1;
+            font-family: inherit;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, color 0.15s ease;
+        }
+
+        .sidebar-close:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         .sidebar-header h1 {
@@ -234,10 +261,20 @@
             inset: 0;
             background: var(--overlay);
             z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
         }
 
         .mobile-overlay.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        body.sidebar-open {
+            overflow: hidden;
         }
 
         @media (max-width: 768px) {
@@ -248,11 +285,22 @@
                 bottom: 0;
                 width: min(280px, 85vw);
                 transform: translateX(-100%);
+                z-index: 160;
                 box-shadow: 4px 0 24px var(--shadow);
             }
 
             .sidebar.open {
                 transform: translateX(0);
+            }
+
+            .sidebar-close {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-overlay {
+                display: block;
             }
 
             .mobile-menu-toggle {
@@ -262,6 +310,7 @@
             }
 
             .main-content {
+                width: 100%;
                 padding-top: calc(48px + var(--safe-top));
             }
 
@@ -271,6 +320,10 @@
 
             .page-chat .mobile-menu-toggle {
                 display: none;
+            }
+
+            .page-chat .app-container {
+                overflow: visible;
             }
         }
 
@@ -297,12 +350,13 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="app-container">
-        <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Open menu">Menu</button>
-        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+        <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">Menu</button>
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar(true)" aria-hidden="true"></div>
 
-        <nav class="sidebar" id="sidebar">
+        <nav class="sidebar" id="sidebar" aria-label="Main navigation">
             <div class="sidebar-header">
                 <h1>Cosmic AI</h1>
+                <button type="button" class="sidebar-close" onclick="toggleSidebar(true)" aria-label="Close menu">&times;</button>
             </div>
             <div class="nav-menu">
                 <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}">Chat</a>
@@ -321,15 +375,42 @@
     </div>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('mobileOverlay').classList.toggle('show');
+        function setSidebarOpen(open) {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('mobileOverlay');
+            sidebar.classList.toggle('open', open);
+            overlay.classList.toggle('show', open);
+            document.body.classList.toggle('sidebar-open', open);
+            overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+
+            document.querySelectorAll('.mobile-menu-toggle, .chat-menu-btn').forEach(function (btn) {
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+        }
+
+        function toggleSidebar(forceClose) {
+            var isOpen = document.getElementById('sidebar').classList.contains('open');
+            if (forceClose === true) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(!isOpen);
+            }
         }
 
         document.querySelectorAll('.nav-item').forEach(function (item) {
             item.addEventListener('click', function () {
-                if (window.innerWidth <= 768) toggleSidebar();
+                if (window.innerWidth <= 768) setSidebarOpen(false);
             });
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.getElementById('sidebar').classList.contains('open')) {
+                setSidebarOpen(false);
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) setSidebarOpen(false);
         });
 
         function applyTheme(theme) {
