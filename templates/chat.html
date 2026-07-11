@@ -8,6 +8,7 @@
     .page-chat .app-container {
         height: 100vh;
         height: 100dvh;
+        min-height: 0 !important;
         overflow: hidden;
     }
 
@@ -18,10 +19,6 @@
         flex-direction: column;
         overflow: hidden;
         width: 100%;
-    }
-
-    .page-chat .footer {
-        display: none;
     }
 
     /* Full-width shell */
@@ -39,7 +36,10 @@
         flex-shrink: 0;
         width: 100%;
         border-bottom: 1px solid var(--border);
-        background: var(--bg-elevated);
+        background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 24px var(--shadow);
     }
 
     .chat-header-inner {
@@ -73,15 +73,17 @@
     .chat-header-title {
         flex: 1;
         min-width: 0;
+        font-family: 'Exo 2', sans-serif;
         font-size: 13px;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--accent);
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-shadow: 0 0 24px var(--accent-glow);
     }
 
     .chat-header-actions {
@@ -109,8 +111,9 @@
     }
 
     .btn-secondary:hover {
-        border-color: var(--border-strong);
-        color: var(--text-primary);
+        border-color: var(--accent);
+        color: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
     }
 
     /* Body fills remaining space */
@@ -148,6 +151,7 @@
     .chat-messages::-webkit-scrollbar-thumb {
         background: var(--border-strong);
         border-radius: 3px;
+        box-shadow: inset 0 0 4px var(--accent-glow);
     }
 
     .message {
@@ -165,24 +169,28 @@
         flex-shrink: 0;
         width: 32px;
         height: 32px;
-        border-radius: 6px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.03em;
+        font-family: 'Exo 2', sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
         border: 1px solid var(--border);
     }
 
     .avatar.user {
         background: var(--surface-active);
         color: var(--accent);
+        border-color: var(--border-strong);
+        box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .avatar.bot {
         background: var(--bg-elevated);
-        color: var(--text-muted);
+        color: var(--accent);
+        border-color: var(--border-strong);
     }
 
     .message-content {
@@ -190,20 +198,23 @@
         padding: 10px 14px;
         font-size: 14px;
         line-height: 1.55;
-        border-radius: 8px;
+        border-radius: 10px;
         word-wrap: break-word;
         overflow-wrap: anywhere;
         white-space: pre-wrap;
         border: 1px solid var(--border);
+        transition: box-shadow 0.2s ease;
     }
 
     .message.user .message-content {
         background: var(--surface-active);
         color: var(--text-primary);
+        border-color: var(--border-strong);
+        box-shadow: 0 0 20px var(--accent-glow);
     }
 
     .message.bot .message-content {
-        background: var(--bg-elevated);
+        background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
         color: var(--text-secondary);
     }
 
@@ -215,10 +226,16 @@
     }
 
     .welcome-message h2 {
-        font-size: clamp(18px, 4vw, 22px);
+        font-family: 'Exo 2', sans-serif;
+        font-size: clamp(22px, 5vw, 28px);
         font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--text-primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .welcome-message p {
@@ -226,6 +243,17 @@
         color: var(--text-muted);
         line-height: 1.65;
         margin: 0;
+    }
+
+    .welcome-message::before {
+        content: '◆';
+        display: block;
+        font-size: 10px;
+        color: var(--accent);
+        letter-spacing: 0.5em;
+        margin-bottom: 16px;
+        opacity: 0.6;
+        text-shadow: 0 0 12px var(--accent-glow);
     }
 
     .typing-indicator {
@@ -244,8 +272,9 @@
         gap: 4px;
         padding: 10px 14px;
         background: var(--bg-elevated);
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .typing-dot {
@@ -254,6 +283,7 @@
         background: var(--accent);
         border-radius: 50%;
         opacity: 0.35;
+        box-shadow: 0 0 6px var(--accent-glow);
         animation: typing 1.2s infinite ease-in-out;
     }
 
@@ -271,7 +301,9 @@
         width: 100%;
         padding: 12px max(16px, var(--safe-right)) calc(12px + var(--safe-bottom)) max(16px, var(--safe-left));
         border-top: 1px solid var(--border);
-        background: var(--bg-elevated);
+        background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
     .chat-input-inner {
@@ -285,14 +317,15 @@
         align-items: flex-end;
         gap: 10px;
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 8px 10px;
         background: var(--bg);
-        transition: border-color 0.15s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .input-group:focus-within {
         border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent), 0 0 20px var(--accent-glow);
     }
 
     .message-input {
@@ -316,26 +349,24 @@
 
     .send-button {
         flex-shrink: 0;
-        padding: 8px 14px;
-        font-size: 12px;
+        padding: 8px 16px;
+        font-family: 'Exo 2', sans-serif;
+        font-size: 11px;
         font-weight: 600;
-        font-family: inherit;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--bg-elevated);
-        background: var(--accent);
+        letter-spacing: 0.08em;
+        color: var(--accent-text);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: background 0.15s ease, opacity 0.15s ease;
-    }
-
-    [data-theme="light"] .send-button {
-        color: #fff;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .send-button:hover:not(:disabled) {
-        background: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 0 24px var(--accent-glow), 0 4px 12px var(--shadow);
     }
 
     .send-button:disabled {
@@ -427,7 +458,7 @@
     <header class="chat-header">
         <div class="chat-header-inner">
             <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">Menu</button>
-            <h2 class="chat-header-title">AI Chat</h2>
+            <h2 class="chat-header-title">New Chat</h2>
             <div class="chat-header-actions">
                 <button type="button" class="btn-secondary" onclick="clearChat()">Clear</button>
             </div>
@@ -439,7 +470,7 @@
             <div class="chat-messages-inner">
                 <div class="welcome-message">
                     <h2>Cosmic AI</h2>
-                    <p>Ask me anything. Powered by LangChain and a free Hugging Face model.</p>
+                    <p>Neural interface online. Ask me anything — powered by LangChain &amp; Hugging Face.</p>
                 </div>
                 <div class="typing-indicator" id="typingIndicator">
                     <div class="avatar bot">AI</div>
@@ -549,7 +580,7 @@
                 inner.appendChild(typingIndicator);
                 var welcome = document.createElement('div');
                 welcome.className = 'welcome-message';
-                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Ask me anything. Powered by LangChain and a free Hugging Face model.</p>';
+                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Neural interface online. Ask me anything — powered by LangChain &amp; Hugging Face.</p>';
                 inner.insertBefore(welcome, typingIndicator);
             })
             .catch(function () {});

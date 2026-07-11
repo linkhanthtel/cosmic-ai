@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}Cosmic AI{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
         (function () {
             var stored = localStorage.getItem('cosmic-theme');
@@ -21,20 +24,26 @@
         :root,
         [data-theme="dark"] {
             color-scheme: dark;
-            --bg: #0f1117;
-            --bg-elevated: #181b24;
-            --bg-sidebar: #14171f;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0a6;
-            --text-muted: #6b7280;
-            --accent: #22d3ee;
-            --accent-hover: #06b6d4;
-            --border: rgba(255, 255, 255, 0.1);
-            --border-strong: rgba(255, 255, 255, 0.16);
-            --surface-hover: rgba(34, 211, 238, 0.08);
-            --surface-active: rgba(34, 211, 238, 0.14);
-            --overlay: rgba(0, 0, 0, 0.5);
-            --shadow: rgba(0, 0, 0, 0.35);
+            --bg: #040810;
+            --bg-elevated: #0a1222;
+            --bg-sidebar: #060d18;
+            --text-primary: #e8f0ff;
+            --text-secondary: #8ba3c7;
+            --text-muted: #5a7094;
+            --accent: #4d9fff;
+            --accent-hover: #6eb3ff;
+            --accent-glow: rgba(77, 159, 255, 0.35);
+            --accent-soft: rgba(77, 159, 255, 0.12);
+            --accent-text: #040810;
+            --border: rgba(100, 160, 255, 0.12);
+            --border-strong: rgba(100, 160, 255, 0.22);
+            --surface-hover: rgba(77, 159, 255, 0.08);
+            --surface-active: rgba(77, 159, 255, 0.16);
+            --overlay: rgba(2, 6, 16, 0.72);
+            --shadow: rgba(0, 0, 0, 0.5);
+            --grid-color: rgba(77, 159, 255, 0.04);
+            --gradient-bg: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(30, 80, 180, 0.18), transparent),
+                           radial-gradient(ellipse 60% 40% at 100% 100%, rgba(20, 60, 140, 0.1), transparent);
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --safe-left: env(safe-area-inset-left, 0px);
@@ -43,20 +52,30 @@
 
         [data-theme="light"] {
             color-scheme: light;
-            --bg: #f4f4f5;
+            --bg: #f4f8ff;
             --bg-elevated: #ffffff;
-            --bg-sidebar: #ffffff;
-            --text-primary: #18181b;
-            --text-secondary: #52525b;
-            --text-muted: #a1a1aa;
-            --accent: #0891b2;
-            --accent-hover: #0e7490;
-            --border: rgba(0, 0, 0, 0.1);
-            --border-strong: rgba(0, 0, 0, 0.14);
-            --surface-hover: rgba(8, 145, 178, 0.08);
-            --surface-active: rgba(8, 145, 178, 0.12);
-            --overlay: rgba(0, 0, 0, 0.35);
-            --shadow: rgba(0, 0, 0, 0.08);
+            --bg-sidebar: #eef4fc;
+            --text-primary: #0a1628;
+            --text-secondary: #3d5a80;
+            --text-muted: #6b85a8;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-glow: rgba(37, 99, 235, 0.25);
+            --accent-soft: rgba(37, 99, 235, 0.08);
+            --accent-text: #ffffff;
+            --border: rgba(37, 99, 235, 0.12);
+            --border-strong: rgba(37, 99, 235, 0.2);
+            --surface-hover: rgba(37, 99, 235, 0.06);
+            --surface-active: rgba(37, 99, 235, 0.1);
+            --overlay: rgba(10, 22, 40, 0.25);
+            --shadow: rgba(37, 99, 235, 0.08);
+            --grid-color: rgba(37, 99, 235, 0.05);
+            --gradient-bg: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(147, 197, 253, 0.35), transparent),
+                           radial-gradient(ellipse 50% 40% at 0% 100%, rgba(191, 219, 254, 0.4), transparent);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
         }
 
         html {
@@ -65,13 +84,28 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
+            background-image: var(--gradient-bg);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
             min-height: 100dvh;
-            transition: background 0.2s ease, color 0.2s ease;
+            transition: background 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 100%);
         }
 
         .app-container {
@@ -79,19 +113,23 @@
             min-height: 100vh;
             min-height: 100dvh;
             position: relative;
+            z-index: 1;
         }
 
         .sidebar {
             width: 240px;
             flex-shrink: 0;
-            background: var(--bg-sidebar);
+            background: color-mix(in srgb, var(--bg-sidebar) 88%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             z-index: 100;
-            transition: transform 0.25s ease, background 0.2s ease;
+            transition: transform 0.25s ease, background 0.3s ease;
             padding-top: var(--safe-top);
             padding-left: var(--safe-left);
+            box-shadow: 4px 0 24px var(--shadow);
         }
 
         .sidebar-header {
@@ -100,11 +138,13 @@
         }
 
         .sidebar-header h1 {
+            font-family: 'Exo 2', sans-serif;
             font-size: 14px;
             font-weight: 700;
-            letter-spacing: 0.15em;
-            color: var(--text-primary);
+            letter-spacing: 0.2em;
+            color: var(--accent);
             text-transform: uppercase;
+            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .nav-menu {
@@ -117,12 +157,12 @@
             display: block;
             padding: 10px 14px;
             margin-bottom: 2px;
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: background 0.15s ease, color 0.15s ease;
+            transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .nav-item:hover {
@@ -133,6 +173,7 @@
         .nav-item.active {
             background: var(--surface-active);
             color: var(--accent);
+            box-shadow: inset 0 0 0 1px var(--border-strong), 0 0 16px var(--accent-glow);
         }
 
         .sidebar-footer {
@@ -149,14 +190,15 @@
             color: var(--text-secondary);
             background: var(--bg-elevated);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .theme-toggle:hover {
-            border-color: var(--border-strong);
-            color: var(--text-primary);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
         }
 
         .main-content {
@@ -166,43 +208,6 @@
             min-height: 0;
             min-width: 0;
             width: 100%;
-        }
-
-        .footer {
-            background: var(--bg-elevated);
-            border-top: 1px solid var(--border);
-            padding: 24px 20px calc(20px + var(--safe-bottom));
-            margin-top: auto;
-        }
-
-        .footer-content {
-            text-align: center;
-        }
-
-        .footer-brand h2 {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            color: var(--text-primary);
-            text-transform: uppercase;
-        }
-
-        .footer-tagline {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 16px;
-            margin-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        .footer-copyright {
-            font-size: 12px;
-            color: var(--text-muted);
         }
 
         .mobile-menu-toggle {
@@ -252,6 +257,8 @@
 
             .mobile-menu-toggle {
                 display: block;
+                border-color: var(--border-strong);
+                box-shadow: 0 0 12px var(--accent-glow);
             }
 
             .main-content {
@@ -298,7 +305,7 @@
                 <h1>Cosmic AI</h1>
             </div>
             <div class="nav-menu">
-                <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}">AI Chat</a>
+                <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}">Chat</a>
                 {% block nav_items %}{% endblock %}
             </div>
             <div class="sidebar-footer">
@@ -312,18 +319,6 @@
             {% block content %}{% endblock %}
         </main>
     </div>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h2>Cosmic AI</h2>
-                <p class="footer-tagline">Empowering your workflow with AI</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copyright">&copy; <strong>2026 Cosmic AI</strong>. All rights reserved.</div>
-        </div>
-    </footer>
 
     <script>
         function toggleSidebar() {
