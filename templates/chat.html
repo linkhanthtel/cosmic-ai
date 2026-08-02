@@ -316,12 +316,15 @@
 
     .input-group {
         display: flex;
-        align-items: flex-end;
-        gap: 10px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 8px;
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 8px 10px;
+        border-radius: 12px;
+        padding: 6px 8px 6px 6px;
         background: var(--bg);
+        min-height: 44px;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -331,18 +334,23 @@
     }
 
     .message-input {
-        flex: 1;
+        flex: 1 1 auto;
         min-width: 0;
+        width: auto;
         border: none;
         outline: none;
         background: transparent;
         font-size: 14px;
-        line-height: 1.5;
+        line-height: 1.4;
         color: var(--text-primary);
         resize: none;
-        min-height: 22px;
+        min-height: 24px;
         max-height: 120px;
+        padding: 8px 4px;
+        margin: 0;
         font-family: inherit;
+        overflow-y: auto;
+        field-sizing: content;
     }
 
     .message-input::placeholder {
@@ -350,8 +358,10 @@
     }
 
     .send-button {
-        flex-shrink: 0;
-        padding: 8px 16px;
+        flex: 0 0 auto;
+        align-self: center;
+        height: 36px;
+        padding: 0 14px;
         font-family: 'Exo 2', sans-serif;
         font-size: 11px;
         font-weight: 600;
@@ -362,6 +372,7 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
+        white-space: nowrap;
         transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
         box-shadow: 0 0 16px var(--accent-glow);
     }
@@ -374,6 +385,146 @@
     .send-button:disabled {
         opacity: 0.45;
         cursor: not-allowed;
+    }
+
+    .attach-button {
+        flex: 0 0 auto;
+        align-self: center;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        line-height: 1;
+        color: var(--text-secondary);
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .attach-button:hover:not(:disabled) {
+        color: var(--accent);
+        background: var(--surface-hover);
+        box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .attach-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .file-input-hidden {
+        display: none;
+    }
+
+    .attachment-preview-bar {
+        display: none;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .attachment-preview-bar.show {
+        display: flex;
+    }
+
+    .attachment-chip {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-elevated);
+        max-width: 100%;
+    }
+
+    .attachment-chip-thumb {
+        width: 44px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+        background: var(--bg);
+    }
+
+    .attachment-chip video.attachment-chip-thumb {
+        object-fit: cover;
+    }
+
+    .attachment-chip-meta {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .attachment-chip-name {
+        font-size: 12px;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+    }
+
+    .attachment-chip-type {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .attachment-chip-remove {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .attachment-chip-remove:hover {
+        color: var(--accent);
+        background: var(--surface-hover);
+    }
+
+    .message-media {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .message-media img,
+    .message-media video {
+        max-width: 100%;
+        max-height: 280px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .message-media-label {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    .upload-error {
+        font-size: 12px;
+        color: #f87171;
+        margin-bottom: 8px;
+        display: none;
+    }
+
+    .upload-error.show {
+        display: block;
     }
 
     /* Tablet */
@@ -418,6 +569,12 @@
 
         .message-input {
             font-size: 16px;
+            padding: 10px 4px;
+        }
+
+        .input-group {
+            gap: 6px;
+            padding: 6px;
         }
 
         .avatar {
@@ -444,8 +601,15 @@
         }
 
         .send-button {
-            padding: 8px 12px;
-            font-size: 11px;
+            height: 34px;
+            padding: 0 12px;
+            font-size: 10px;
+        }
+
+        .attach-button {
+            width: 34px;
+            height: 34px;
+            font-size: 18px;
         }
     }
 
@@ -491,7 +655,18 @@
 
         <div class="chat-input-bar">
             <div class="chat-input-inner">
+                <div class="upload-error" id="uploadError"></div>
+                <div class="attachment-preview-bar" id="attachmentPreview"></div>
                 <div class="input-group">
+                    <input
+                        type="file"
+                        id="fileInput"
+                        class="file-input-hidden"
+                        accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime"
+                        multiple
+                        onchange="handleFileSelect(event)"
+                    >
+                    <button type="button" class="attach-button" id="attachButton" onclick="document.getElementById('fileInput').click()" aria-label="Attach image or video" title="Attach image or video">+</button>
                     <textarea
                         id="messageInput"
                         class="message-input"
@@ -512,6 +687,7 @@
 {% block scripts %}
 <script>
     let isTyping = false;
+    let pendingAttachments = [];
 
     function handleKeyDown(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -539,23 +715,154 @@
         return data.error || data.message || 'Request failed (' + status + ')';
     }
 
+    function showUploadError(message) {
+        var el = document.getElementById('uploadError');
+        el.textContent = message;
+        el.classList.add('show');
+    }
+
+    function clearUploadError() {
+        var el = document.getElementById('uploadError');
+        el.textContent = '';
+        el.classList.remove('show');
+    }
+
+    function renderAttachmentPreview() {
+        var bar = document.getElementById('attachmentPreview');
+        bar.innerHTML = '';
+        if (!pendingAttachments.length) {
+            bar.classList.remove('show');
+            return;
+        }
+
+        bar.classList.add('show');
+        pendingAttachments.forEach(function (item, index) {
+            var chip = document.createElement('div');
+            chip.className = 'attachment-chip';
+
+            if (item.media_type === 'image') {
+                var img = document.createElement('img');
+                img.className = 'attachment-chip-thumb';
+                img.src = item.url;
+                img.alt = item.name;
+                chip.appendChild(img);
+            } else {
+                var video = document.createElement('video');
+                video.className = 'attachment-chip-thumb';
+                video.src = item.url;
+                video.muted = true;
+                chip.appendChild(video);
+            }
+
+            var meta = document.createElement('div');
+            meta.className = 'attachment-chip-meta';
+            meta.innerHTML =
+                '<div class="attachment-chip-name">' + escapeHtml(item.name) + '</div>' +
+                '<div class="attachment-chip-type">' + item.media_type + '</div>';
+            chip.appendChild(meta);
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'attachment-chip-remove';
+            removeBtn.setAttribute('aria-label', 'Remove attachment');
+            removeBtn.textContent = '×';
+            removeBtn.onclick = function () {
+                pendingAttachments = pendingAttachments.filter(function (a) {
+                    return a.url !== item.url;
+                });
+                renderAttachmentPreview();
+            };
+            chip.appendChild(removeBtn);
+
+            bar.appendChild(chip);
+        });
+    }
+
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function formatMessageHtml(message) {
+        if (!message) return '';
+        return escapeHtml(message)
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function renderAttachmentsHtml(attachments) {
+        if (!attachments || !attachments.length) return '';
+        var html = '<div class="message-media">';
+        attachments.forEach(function (item) {
+            if (item.media_type === 'image') {
+                html += '<img src="' + escapeHtml(item.url) + '" alt="' + escapeHtml(item.name || 'Image') + '">';
+            } else {
+                html += '<video src="' + escapeHtml(item.url) + '" controls playsinline preload="metadata"></video>';
+            }
+            if (item.name) {
+                html += '<div class="message-media-label">' + escapeHtml(item.name) + '</div>';
+            }
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function handleFileSelect(event) {
+        var files = Array.from(event.target.files || []);
+        event.target.value = '';
+        if (!files.length) return;
+
+        clearUploadError();
+        var attachButton = document.getElementById('attachButton');
+        attachButton.disabled = true;
+
+        Promise.all(files.map(function (file) {
+            var formData = new FormData();
+            formData.append('file', file);
+            return fetch('/upload', { method: 'POST', body: formData })
+                .then(function (r) {
+                    return r.json().then(function (data) {
+                        if (!r.ok) throw new Error(apiErrorMessage(data, r.status));
+                        return data;
+                    });
+                });
+        }))
+        .then(function (uploaded) {
+            pendingAttachments = pendingAttachments.concat(uploaded);
+            renderAttachmentPreview();
+        })
+        .catch(function (err) {
+            showUploadError(err.message);
+        })
+        .finally(function () {
+            attachButton.disabled = false;
+        });
+    }
+
     function sendMessage() {
         var messageInput = document.getElementById('messageInput');
         var sendButton = document.getElementById('sendButton');
         var message = messageInput.value.trim();
-        if (!message || isTyping) return;
+        var attachments = pendingAttachments.slice();
+        if ((!message && !attachments.length) || isTyping) return;
 
         document.querySelector('.welcome-message')?.remove();
-        addMessageToChat(message, 'user');
+        addMessageToChat(message, 'user', attachments);
         messageInput.value = '';
+        pendingAttachments = [];
+        renderAttachmentPreview();
         autoResize(messageInput);
         showTypingIndicator();
         sendButton.disabled = true;
+        document.getElementById('attachButton').disabled = true;
 
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify({ message: message, attachments: attachments })
         })
         .then(function (r) {
             return r.json().then(function (data) {
@@ -573,11 +880,15 @@
         })
         .finally(function () {
             sendButton.disabled = false;
+            document.getElementById('attachButton').disabled = false;
             messageInput.focus();
         });
     }
 
     function clearChat() {
+        pendingAttachments = [];
+        renderAttachmentPreview();
+        clearUploadError();
         fetch('/conversation/clear', { method: 'POST' })
             .then(function () {
                 var inner = document.querySelector('.chat-messages-inner');
@@ -586,7 +897,7 @@
                 inner.appendChild(typingIndicator);
                 var welcome = document.createElement('div');
                 welcome.className = 'welcome-message';
-                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Neural interface online. Ask me anything — powered by LangChain &amp; Hugging Face.</p>';
+                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Ask me anything</p>';
                 inner.insertBefore(welcome, typingIndicator);
             })
             .catch(function () {});
@@ -603,7 +914,7 @@
         document.getElementById('typingIndicator').classList.remove('show');
     }
 
-    function addMessageToChat(message, sender) {
+    function addMessageToChat(message, sender, attachments) {
         var inner = document.querySelector('.chat-messages-inner');
         var typingIndicator = document.getElementById('typingIndicator');
         document.querySelector('.welcome-message')?.remove();
@@ -617,9 +928,14 @@
 
         var content = document.createElement('div');
         content.className = 'message-content';
-        content.innerHTML = message
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
+        var html = formatMessageHtml(message);
+        if (attachments && attachments.length) {
+            html += renderAttachmentsHtml(attachments);
+        }
+        if (!html) {
+            html = renderAttachmentsHtml(attachments);
+        }
+        content.innerHTML = html;
 
         messageDiv.appendChild(avatar);
         messageDiv.appendChild(content);

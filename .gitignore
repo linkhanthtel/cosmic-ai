@@ -33,5 +33,8 @@ Thumbs.db
 # Environment secrets
 .env
 
+# Temporary uploads (not committed)
+uploads/
+
 # Local env template is committed; real secrets go in .env
 !.env.example
