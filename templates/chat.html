@@ -627,10 +627,10 @@
 <div class="chat-layout">
     <header class="chat-header">
         <div class="chat-header-inner">
-            <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">Menu</button>
-            <h2 class="chat-header-title">New Chat</h2>
+            <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar" data-i18n-aria="nav.openMenu" data-i18n="nav.menu">Menu</button>
+            <h2 class="chat-header-title" data-i18n="chat.newChat">New Chat</h2>
             <div class="chat-header-actions">
-                <button type="button" class="btn-secondary" onclick="clearChat()">Clear</button>
+                <button type="button" class="btn-secondary" onclick="clearChat()" data-i18n="chat.clear">Clear</button>
             </div>
         </div>
     </header>
@@ -639,8 +639,8 @@
         <div class="chat-messages" id="chatContainer">
             <div class="chat-messages-inner">
                 <div class="welcome-message">
-                    <h2>Cosmic AI</h2>
-                    <p>Ask me anything</p>
+                    <h2 data-i18n="chat.welcomeTitle">Cosmic AI</h2>
+                    <p data-i18n="chat.welcomeSubtitle">Ask me anything</p>
                 </div>
                 <div class="typing-indicator" id="typingIndicator">
                     <div class="avatar bot">AI</div>
@@ -666,17 +666,19 @@
                         multiple
                         onchange="handleFileSelect(event)"
                     >
-                    <button type="button" class="attach-button" id="attachButton" onclick="document.getElementById('fileInput').click()" aria-label="Attach image or video" title="Attach image or video">+</button>
+                    <button type="button" class="attach-button" id="attachButton" onclick="document.getElementById('fileInput').click()" data-i18n-aria="chat.attach" data-i18n-title="chat.attach" aria-label="Attach image or video" title="Attach image or video">+</button>
                     <textarea
                         id="messageInput"
                         class="message-input"
                         placeholder="Type your message..."
+                        data-i18n-placeholder="chat.placeholder"
                         rows="1"
                         onkeydown="handleKeyDown(event)"
                         oninput="autoResize(this)"
                         aria-label="Message input"
+                        data-i18n-aria="chat.messageInput"
                     ></textarea>
-                    <button type="button" class="send-button" id="sendButton" onclick="sendMessage()">Send</button>
+                    <button type="button" class="send-button" id="sendButton" onclick="sendMessage()" data-i18n="chat.send">Send</button>
                 </div>
             </div>
         </div>
@@ -707,12 +709,12 @@
     }
 
     function apiErrorMessage(data, status) {
-        if (!data) return 'Request failed (' + status + ')';
+        if (!data) return CosmicI18n.t('chat.requestFailed', { status: status });
         if (typeof data.detail === 'string') return data.detail;
         if (Array.isArray(data.detail)) {
             return data.detail.map(function (e) { return e.msg || JSON.stringify(e); }).join('; ');
         }
-        return data.error || data.message || 'Request failed (' + status + ')';
+        return data.error || data.message || CosmicI18n.t('chat.requestFailed', { status: status });
     }
 
     function showUploadError(message) {
@@ -764,7 +766,7 @@
             var removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'attachment-chip-remove';
-            removeBtn.setAttribute('aria-label', 'Remove attachment');
+            removeBtn.setAttribute('aria-label', CosmicI18n.t('chat.removeAttachment'));
             removeBtn.textContent = '×';
             removeBtn.onclick = function () {
                 pendingAttachments = pendingAttachments.filter(function (a) {
@@ -872,17 +874,26 @@
         })
         .then(function (data) {
             hideTypingIndicator();
-            addMessageToChat(data.response || 'No response.', 'bot');
+            addMessageToChat(data.response || CosmicI18n.t('chat.noResponse'), 'bot');
         })
         .catch(function (err) {
             hideTypingIndicator();
-            addMessageToChat('Error: ' + err.message, 'bot');
+            addMessageToChat(CosmicI18n.t('chat.errorPrefix') + ' ' + err.message, 'bot');
         })
         .finally(function () {
             sendButton.disabled = false;
             document.getElementById('attachButton').disabled = false;
             messageInput.focus();
         });
+    }
+
+    function buildWelcomeMessage() {
+        var welcome = document.createElement('div');
+        welcome.className = 'welcome-message';
+        welcome.innerHTML =
+            '<h2 data-i18n="chat.welcomeTitle">' + escapeHtml(CosmicI18n.t('chat.welcomeTitle')) + '</h2>' +
+            '<p data-i18n="chat.welcomeSubtitle">' + escapeHtml(CosmicI18n.t('chat.welcomeSubtitle')) + '</p>';
+        return welcome;
     }
 
     function clearChat() {
@@ -895,10 +906,7 @@
                 var typingIndicator = document.getElementById('typingIndicator');
                 inner.innerHTML = '';
                 inner.appendChild(typingIndicator);
-                var welcome = document.createElement('div');
-                welcome.className = 'welcome-message';
-                welcome.innerHTML = '<h2>Cosmic AI</h2><p>Ask me anything</p>';
-                inner.insertBefore(welcome, typingIndicator);
+                inner.insertBefore(buildWelcomeMessage(), typingIndicator);
             })
             .catch(function () {});
     }
@@ -942,6 +950,14 @@
         inner.insertBefore(messageDiv, typingIndicator);
         scrollToBottom();
     }
+
+    window.addEventListener('cosmic:languagechange', function () {
+        var welcome = document.querySelector('.welcome-message');
+        if (welcome) {
+            welcome.replaceWith(buildWelcomeMessage());
+        }
+        CosmicI18n.apply(document);
+    });
 
     window.onload = function () {
         document.getElementById('messageInput').focus();

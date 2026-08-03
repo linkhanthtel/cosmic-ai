@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
@@ -100,6 +101,11 @@ def chat_page(request: Request):
     return templates.TemplateResponse(request, "chat.html", {})
 
 
+@app.get("/settings", response_class=HTMLResponse)
+def settings_page(request: Request):
+    return templates.TemplateResponse(request, "settings.html", {})
+
+
 @app.post("/upload")
 async def upload_media(file: UploadFile = File(...)):
     if not file.content_type or file.content_type not in ALLOWED_TYPES:
@@ -179,6 +185,9 @@ def chat(body: ChatRequest):
 @app.post("/conversation/clear")
 def clear_conversation():
     return {"message": get_chatbot().clear_conversation()}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 if __name__ == "__main__":

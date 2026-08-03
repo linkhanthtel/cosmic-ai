@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Cosmic AI{% endblock %}
+{% block body_class %}page-settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-settings .main-content {
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .settings-page {
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: calc(24px + var(--safe-top)) max(20px, var(--safe-right)) calc(32px + var(--safe-bottom)) max(20px, var(--safe-left));
+    }
+
+    .settings-header {
+        margin-bottom: 28px;
+    }
+
+    .settings-header h2 {
+        font-family: 'Exo 2', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 8px;
+        text-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .settings-header p {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    .settings-section {
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 24px var(--shadow);
+    }
+
+    .settings-section.is-disabled {
+        opacity: 0.72;
+    }
+
+    .settings-section-head {
+        margin-bottom: 16px;
+    }
+
+    .settings-section-head h3 {
+        font-family: 'Exo 2', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    .settings-section-head p {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .settings-field {
+        margin-bottom: 14px;
+    }
+
+    .settings-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .settings-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .option-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .option-btn {
+        flex: 1 1 120px;
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: inherit;
+        color: var(--text-secondary);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .option-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .option-btn.active {
+        color: var(--accent);
+        background: var(--surface-active);
+        border-color: var(--border-strong);
+        box-shadow: inset 0 0 0 1px var(--border-strong), 0 0 16px var(--accent-glow);
+    }
+
+    .coming-soon-badge {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        background: var(--accent-soft);
+    }
+
+    @media (max-width: 768px) {
+        .settings-page {
+            padding-top: calc(16px + var(--safe-top));
+        }
+
+        .settings-header h2 {
+            font-size: 18px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <header class="settings-header">
+        <h2 data-i18n="settings.title">Settings</h2>
+        <p data-i18n="settings.subtitle">Customize your Cosmic AI experience.</p>
+    </header>
+
+    <section class="settings-section" aria-labelledby="appearanceHeading">
+        <div class="settings-section-head">
+            <h3 id="appearanceHeading" data-i18n="settings.appearance">Appearance</h3>
+            <p data-i18n="settings.appearanceHint">Choose how Cosmic AI looks on your device.</p>
+        </div>
+        <div class="settings-field">
+            <label data-i18n="settings.theme">Theme</label>
+            <div class="option-group" role="group" aria-label="Theme">
+                <button type="button" class="option-btn" data-theme-option="light" data-i18n="settings.themeLight">Light</button>
+                <button type="button" class="option-btn" data-theme-option="dark" data-i18n="settings.themeDark">Dark</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="settings-section" aria-labelledby="languageHeading">
+        <div class="settings-section-head">
+            <h3 id="languageHeading" data-i18n="settings.language">Language</h3>
+            <p data-i18n="settings.languageHint">Choose your preferred language for the interface.</p>
+        </div>
+        <div class="settings-field">
+            <div class="option-group" role="group" aria-label="Language">
+                <button type="button" class="option-btn" data-lang-option="en" data-i18n="settings.languageEn">English</button>
+                <button type="button" class="option-btn" data-lang-option="my" data-i18n="settings.languageMy">Burmese</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="settings-section is-disabled" aria-labelledby="profileHeading">
+        <div class="settings-section-head">
+            <h3 id="profileHeading" data-i18n="settings.profile">Profile</h3>
+            <p data-i18n="settings.profileHint">More profile customization is coming soon.</p>
+        </div>
+        <span class="coming-soon-badge" data-i18n="settings.comingSoon">Coming soon</span>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function syncSettingsControls() {
+        var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+        var lang = window.CosmicPrefs.getLanguage();
+
+        document.querySelectorAll('[data-theme-option]').forEach(function (btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-theme-option') === theme);
+        });
+        document.querySelectorAll('[data-lang-option]').forEach(function (btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-lang-option') === lang);
+        });
+    }
+
+    document.querySelectorAll('[data-theme-option]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            window.CosmicPrefs.setTheme(btn.getAttribute('data-theme-option'));
+            syncSettingsControls();
+        });
+    });
+
+    document.querySelectorAll('[data-lang-option]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            window.CosmicPrefs.setLanguage(btn.getAttribute('data-lang-option'));
+            syncSettingsControls();
+        });
+    });
+
+    window.addEventListener('cosmic:themechange', syncSettingsControls);
+    window.addEventListener('cosmic:languagechange', syncSettingsControls);
+
+    syncSettingsControls();
+    window.CosmicI18n.apply(document);
+</script>
+{% endblock %}

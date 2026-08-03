@@ -6,12 +6,15 @@
     <title>{% block title %}Cosmic AI{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Myanmar:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
         (function () {
             var stored = localStorage.getItem('cosmic-theme');
             var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
             document.documentElement.setAttribute('data-theme', theme);
+
+            var lang = localStorage.getItem('cosmic-lang');
+            document.documentElement.setAttribute('lang', lang === 'my' ? 'my' : 'en');
         })();
     </script>
     <style>
@@ -93,6 +96,10 @@
             min-height: 100dvh;
             transition: background 0.3s ease, color 0.3s ease;
             position: relative;
+        }
+
+        html[lang="my"] body {
+            font-family: 'Noto Sans Myanmar', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         body::before {
@@ -204,28 +211,7 @@
         }
 
         .sidebar-footer {
-            padding: 12px 10px calc(16px + var(--safe-bottom));
-            border-top: 1px solid var(--border);
-        }
-
-        .theme-toggle {
-            width: 100%;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            color: var(--text-secondary);
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 16px var(--accent-glow);
+            display: none;
         }
 
         .main-content {
@@ -350,22 +336,18 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="app-container">
-        <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">Menu</button>
+        <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar" data-i18n-aria="nav.openMenu" data-i18n="nav.menu">Menu</button>
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar(true)" aria-hidden="true"></div>
 
         <nav class="sidebar" id="sidebar" aria-label="Main navigation">
             <div class="sidebar-header">
                 <h1>Cosmic AI</h1>
-                <button type="button" class="sidebar-close" onclick="toggleSidebar(true)" aria-label="Close menu">&times;</button>
+                <button type="button" class="sidebar-close" onclick="toggleSidebar(true)" aria-label="Close menu" data-i18n-aria="nav.closeMenu">&times;</button>
             </div>
             <div class="nav-menu">
-                <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}">Chat</a>
+                <a href="/chat" class="nav-item {% if request.url.path == '/chat' %}active{% endif %}" data-i18n="nav.chat">Chat</a>
+                <a href="/settings" class="nav-item {% if request.url.path == '/settings' %}active{% endif %}" data-i18n="nav.settings">Settings</a>
                 {% block nav_items %}{% endblock %}
-            </div>
-            <div class="sidebar-footer">
-                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light or dark theme">
-                    Switch to light mode
-                </button>
             </div>
         </nav>
 
@@ -374,6 +356,8 @@
         </main>
     </div>
 
+    <script src="/static/js/preferences.js"></script>
+    <script src="/static/js/i18n.js"></script>
     <script>
         function setSidebarOpen(open) {
             var sidebar = document.getElementById('sidebar');
@@ -413,24 +397,11 @@
             if (window.innerWidth > 768) setSidebarOpen(false);
         });
 
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('cosmic-theme', theme);
-            var btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.CosmicI18n) {
+                window.CosmicI18n.apply(document);
             }
-        }
-
-        document.getElementById('themeToggle').addEventListener('click', function () {
-            var current = document.documentElement.getAttribute('data-theme') || 'dark';
-            applyTheme(current === 'dark' ? 'light' : 'dark');
         });
-
-        (function () {
-            var theme = document.documentElement.getAttribute('data-theme') || 'dark';
-            applyTheme(theme);
-        })();
     </script>
     {% block scripts %}{% endblock %}
 </body>
