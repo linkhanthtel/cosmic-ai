@@ -1,6 +1,6 @@
-# Cosmic AI
+# Cosmic AI (Under Development)
 
-Minimal chat UI + LangChain practice app using a **free Hugging Face model**.
+Chat UI + LangChain practice app using a Hugging Face model**.
 
 ## What you have
 
