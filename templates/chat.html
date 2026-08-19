@@ -62,7 +62,7 @@
         border: 1px solid var(--border-strong);
         border-radius: 8px;
         cursor: pointer;
-        transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        transition: border-color var(--motion) ease, background var(--motion) ease, box-shadow var(--motion) ease, color var(--motion) ease;
         box-shadow: 0 0 12px var(--accent-glow);
     }
 
@@ -86,6 +86,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         text-shadow: 0 0 24px var(--accent-glow);
+        animation: glowSoft 7s ease-in-out infinite;
     }
 
     .chat-header-actions {
@@ -108,8 +109,14 @@
         border: 1px solid var(--border);
         border-radius: 6px;
         cursor: pointer;
-        transition: border-color 0.15s ease, color 0.15s ease;
+        transition: border-color var(--motion) ease, color var(--motion) ease, box-shadow var(--motion) ease, transform var(--motion) ease;
         white-space: nowrap;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+        }
     }
 
     .btn-secondary:hover {
@@ -161,10 +168,26 @@
         align-items: flex-start;
         gap: 10px;
         margin-bottom: 14px;
+        animation: fadeUp var(--motion-med) ease both;
     }
 
     .message.user {
         flex-direction: row-reverse;
+        animation-name: messageInUser;
+    }
+
+    .message.bot {
+        animation-name: messageInBot;
+    }
+
+    @keyframes messageInUser {
+        from { opacity: 0; transform: translateX(10px); }
+        to { opacity: 1; transform: none; }
+    }
+
+    @keyframes messageInBot {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: none; }
     }
 
     .avatar {
@@ -205,7 +228,7 @@
         overflow-wrap: anywhere;
         white-space: pre-wrap;
         border: 1px solid var(--border);
-        transition: box-shadow 0.2s ease;
+        transition: box-shadow var(--motion) ease, border-color var(--motion) ease;
     }
 
     .message.user .message-content {
@@ -225,6 +248,7 @@
         padding: clamp(24px, 8vw, 48px) 16px;
         max-width: 420px;
         margin: 0 auto;
+        animation: fadeUp 0.4s ease both;
     }
 
     .welcome-message h2 {
@@ -238,6 +262,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        animation: glowSoft 8s ease-in-out infinite;
     }
 
     .welcome-message p {
@@ -267,6 +292,7 @@
 
     .typing-indicator.show {
         display: flex;
+        animation: fadeUp var(--motion) ease both;
     }
 
     .typing-dots {
@@ -325,7 +351,7 @@
         padding: 6px 8px 6px 6px;
         background: var(--bg);
         min-height: 44px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition: border-color var(--motion) ease, box-shadow var(--motion) ease, background var(--motion) ease;
     }
 
     .input-group:focus-within {
@@ -373,13 +399,22 @@
         border-radius: 8px;
         cursor: pointer;
         white-space: nowrap;
-        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        transition: transform var(--motion) ease, box-shadow var(--motion) ease, opacity var(--motion) ease;
         box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .send-button:hover:not(:disabled) {
-        transform: translateY(-1px);
         box-shadow: 0 0 24px var(--accent-glow), 0 4px 12px var(--shadow);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+    }
+
+    .send-button:active:not(:disabled) {
+        transform: translateY(0);
     }
 
     .send-button:disabled {
@@ -402,7 +437,7 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        transition: color var(--motion) ease, background var(--motion) ease, box-shadow var(--motion) ease, transform var(--motion) ease;
     }
 
     .attach-button:hover:not(:disabled) {
@@ -429,6 +464,7 @@
 
     .attachment-preview-bar.show {
         display: flex;
+        animation: fadeUp var(--motion) ease both;
     }
 
     .attachment-chip {
@@ -441,6 +477,8 @@
         border-radius: 8px;
         background: var(--bg-elevated);
         max-width: 100%;
+        animation: fadeUp var(--motion) ease both;
+        transition: border-color var(--motion) ease, box-shadow var(--motion) ease;
     }
 
     .attachment-chip-thumb {
@@ -488,6 +526,7 @@
         cursor: pointer;
         font-size: 16px;
         line-height: 1;
+        transition: color var(--motion) ease, background var(--motion) ease;
     }
 
     .attachment-chip-remove:hover {
@@ -525,6 +564,7 @@
 
     .upload-error.show {
         display: block;
+        animation: fadeUp var(--motion) ease both;
     }
 
     /* Tablet */
@@ -610,6 +650,26 @@
             width: 34px;
             height: 34px;
             font-size: 18px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .message,
+        .message.user,
+        .message.bot,
+        .welcome-message,
+        .welcome-message h2,
+        .chat-header-title,
+        .typing-indicator.show,
+        .attachment-preview-bar.show,
+        .attachment-chip,
+        .upload-error.show {
+            animation: none;
+        }
+
+        .send-button:hover:not(:disabled),
+        .btn-secondary:hover {
+            transform: none;
         }
     }
 
