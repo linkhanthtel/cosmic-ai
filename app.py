@@ -1,6 +1,7 @@
 import os
 import re
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -11,9 +12,9 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from chatbot import ChatBot
+import db
 
 templates = Jinja2Templates(directory="templates")
-app = FastAPI(title="Cosmic AI")
 
 UPLOAD_DIR = Path("uploads/tmp")
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
@@ -78,12 +79,18 @@ class Attachment(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str = ""
+    conversation_id: str | None = None
     attachments: list[Attachment] = Field(default_factory=list)
 
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
     ensure_upload_dir()
+    db.init_db()
+    yield
+
+
+app = FastAPI(title="Cosmic AI", lifespan=lifespan)
 
 
 @app.get("/health")
@@ -152,10 +159,48 @@ def get_media(file_id: str):
     return FileResponse(path, media_type=content_type)
 
 
+def conversation_id_or_400(value: str | None) -> str | None:
+    if value is None or value == "":
+        return None
+    if not re.fullmatch(r"[a-f0-9-]{36}", value):
+        raise HTTPException(status_code=400, detail="Invalid conversation id")
+    return value
+
+
+def attachment_payload(attachments: list[Attachment]) -> list[dict]:
+    return [
+        {"url": item.url, "media_type": item.media_type, "name": item.name}
+        for item in attachments
+    ]
+
+
+@app.get("/conversations")
+def list_conversations():
+    return {"conversations": db.list_conversations()}
+
+
+@app.get("/conversations/{conversation_id}")
+def get_conversation(conversation_id: str):
+    conversation_id = conversation_id_or_400(conversation_id)
+    conversation = db.get_conversation(conversation_id)
+    if conversation is None:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return conversation
+
+
+@app.delete("/conversations/{conversation_id}")
+def delete_conversation(conversation_id: str):
+    conversation_id = conversation_id_or_400(conversation_id)
+    if not db.delete_conversation(conversation_id):
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return {"ok": True}
+
+
 @app.post("/chat")
 def chat(body: ChatRequest):
     message = body.message.strip()
     attachments = body.attachments
+    conversation_id = conversation_id_or_400(body.conversation_id)
 
     if not message and not attachments:
         raise HTTPException(status_code=400, detail="Add a message or attach a file")
@@ -178,8 +223,32 @@ def chat(body: ChatRequest):
         else:
             response = bot.get_response(message)
     except Exception as e:
+        db.add_log("chat_error", {"detail": str(e)})
         raise HTTPException(status_code=500, detail=str(e)) from e
-    return {"response": response, "timestamp": datetime.now().isoformat()}
+
+    saved_attachments = attachment_payload(attachments)
+    title = db.make_title(message, saved_attachments)
+
+    if conversation_id:
+        existing = db.get_conversation(conversation_id)
+        if existing is None:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        if existing["title"] in ("New Chat", ""):
+            db.set_conversation_title(conversation_id, title)
+    else:
+        created = db.create_conversation(title)
+        conversation_id = created["id"]
+
+    db.add_message(conversation_id, "user", message, saved_attachments)
+    db.add_message(conversation_id, "assistant", response, [])
+    conversation = db.get_conversation(conversation_id)
+
+    return {
+        "response": response,
+        "timestamp": datetime.now().isoformat(),
+        "conversation_id": conversation_id,
+        "title": conversation["title"] if conversation else title,
+    }
 
 
 @app.post("/conversation/clear")

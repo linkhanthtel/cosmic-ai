@@ -8,6 +8,7 @@ primary_region = "iad"
   PORT = "8080"
   # The HF model to call. Set the token separately: fly secrets set HF_TOKEN=hf_...
   HF_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
+  SQLITE_PATH = "data/cosmic.db"
 
 [http_service]
   internal_port = 8080

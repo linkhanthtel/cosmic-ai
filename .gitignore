@@ -36,5 +36,9 @@ Thumbs.db
 # Temporary uploads (not committed)
 uploads/
 
+# Local SQLite data
+data/*.db
+data/*.db-*
+
 # Local env template is committed; real secrets go in .env
 !.env.example

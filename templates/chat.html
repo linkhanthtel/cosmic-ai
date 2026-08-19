@@ -171,6 +171,10 @@
         animation: fadeUp var(--motion-med) ease both;
     }
 
+    .message.instant {
+        animation: none;
+    }
+
     .message.user {
         flex-direction: row-reverse;
         animation-name: messageInUser;
@@ -690,7 +694,7 @@
             <button type="button" class="chat-menu-btn" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar" data-i18n-aria="nav.openMenu" data-i18n="nav.menu">Menu</button>
             <h2 class="chat-header-title" data-i18n="chat.newChat">New Chat</h2>
             <div class="chat-header-actions">
-                <button type="button" class="btn-secondary" onclick="clearChat()" data-i18n="chat.clear">Clear</button>
+                <button type="button" class="btn-secondary" onclick="startNewChat()" data-i18n="chat.newChat">New Chat</button>
             </div>
         </div>
     </header>
@@ -750,6 +754,7 @@
 <script>
     let isTyping = false;
     let pendingAttachments = [];
+    let currentConversationId = CosmicChats.activeIdFromUrl() || null;
 
     function handleKeyDown(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -924,7 +929,11 @@
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message, attachments: attachments })
+            body: JSON.stringify({
+                message: message,
+                attachments: attachments,
+                conversation_id: currentConversationId
+            })
         })
         .then(function (r) {
             return r.json().then(function (data) {
@@ -935,6 +944,12 @@
         .then(function (data) {
             hideTypingIndicator();
             addMessageToChat(data.response || CosmicI18n.t('chat.noResponse'), 'bot');
+            if (data.conversation_id) {
+                currentConversationId = data.conversation_id;
+                history.replaceState({}, '', '/chat?c=' + encodeURIComponent(data.conversation_id));
+                setHeaderTitle(data.title || CosmicI18n.t('chat.newChat'), false);
+                CosmicChats.refresh(currentConversationId);
+            }
         })
         .catch(function (err) {
             hideTypingIndicator();
@@ -947,6 +962,60 @@
         });
     }
 
+    function setHeaderTitle(title, isNew) {
+        var el = document.querySelector('.chat-header-title');
+        if (!el) return;
+        if (isNew) {
+            el.setAttribute('data-i18n', 'chat.newChat');
+            el.textContent = CosmicI18n.t('chat.newChat');
+            return;
+        }
+        el.removeAttribute('data-i18n');
+        el.textContent = title || CosmicI18n.t('chat.newChat');
+    }
+
+    function resetChatView(showWelcome) {
+        pendingAttachments = [];
+        renderAttachmentPreview();
+        clearUploadError();
+        var inner = document.querySelector('.chat-messages-inner');
+        var typingIndicator = document.getElementById('typingIndicator');
+        inner.innerHTML = '';
+        inner.appendChild(typingIndicator);
+        hideTypingIndicator();
+        if (showWelcome) {
+            inner.insertBefore(buildWelcomeMessage(), typingIndicator);
+        }
+    }
+
+    function startNewChat() {
+        currentConversationId = null;
+        history.replaceState({}, '', '/chat');
+        setHeaderTitle('', true);
+        resetChatView(true);
+        CosmicChats.refresh('');
+        fetch('/conversation/clear', { method: 'POST' }).catch(function () {});
+        document.getElementById('messageInput').focus();
+    }
+
+    function loadConversation(id) {
+        CosmicChats.get(id)
+            .then(function (data) {
+                currentConversationId = data.id;
+                setHeaderTitle(data.title, false);
+                resetChatView(!data.messages.length);
+                (data.messages || []).forEach(function (msg) {
+                    var sender = msg.role === 'user' ? 'user' : 'bot';
+                    addMessageToChat(msg.content, sender, msg.attachments, true);
+                });
+                CosmicChats.refresh(data.id);
+                scrollToBottom();
+            })
+            .catch(function () {
+                startNewChat();
+            });
+    }
+
     function buildWelcomeMessage() {
         var welcome = document.createElement('div');
         welcome.className = 'welcome-message';
@@ -954,21 +1023,6 @@
             '<h2 data-i18n="chat.welcomeTitle">' + escapeHtml(CosmicI18n.t('chat.welcomeTitle')) + '</h2>' +
             '<p data-i18n="chat.welcomeSubtitle">' + escapeHtml(CosmicI18n.t('chat.welcomeSubtitle')) + '</p>';
         return welcome;
-    }
-
-    function clearChat() {
-        pendingAttachments = [];
-        renderAttachmentPreview();
-        clearUploadError();
-        fetch('/conversation/clear', { method: 'POST' })
-            .then(function () {
-                var inner = document.querySelector('.chat-messages-inner');
-                var typingIndicator = document.getElementById('typingIndicator');
-                inner.innerHTML = '';
-                inner.appendChild(typingIndicator);
-                inner.insertBefore(buildWelcomeMessage(), typingIndicator);
-            })
-            .catch(function () {});
     }
 
     function showTypingIndicator() {
@@ -982,13 +1036,13 @@
         document.getElementById('typingIndicator').classList.remove('show');
     }
 
-    function addMessageToChat(message, sender, attachments) {
+    function addMessageToChat(message, sender, attachments, instant) {
         var inner = document.querySelector('.chat-messages-inner');
         var typingIndicator = document.getElementById('typingIndicator');
         document.querySelector('.welcome-message')?.remove();
 
         var messageDiv = document.createElement('div');
-        messageDiv.className = 'message ' + sender;
+        messageDiv.className = 'message ' + sender + (instant ? ' instant' : '');
 
         var avatar = document.createElement('div');
         avatar.className = 'avatar ' + sender;
@@ -1011,16 +1065,30 @@
         scrollToBottom();
     }
 
+    window.onConversationDeleted = function (id) {
+        if (id === currentConversationId) {
+            startNewChat();
+        } else {
+            CosmicChats.refresh(currentConversationId || '');
+        }
+    };
+
     window.addEventListener('cosmic:languagechange', function () {
         var welcome = document.querySelector('.welcome-message');
         if (welcome) {
             welcome.replaceWith(buildWelcomeMessage());
+        }
+        if (!currentConversationId) {
+            setHeaderTitle('', true);
         }
         CosmicI18n.apply(document);
     });
 
     window.onload = function () {
         document.getElementById('messageInput').focus();
+        if (currentConversationId) {
+            loadConversation(currentConversationId);
+        }
     };
 </script>
 {% endblock %}
